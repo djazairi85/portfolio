@@ -1,5 +1,6 @@
 package name.abuchen.portfolio.ui.views;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -12,6 +13,9 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
+import org.eclipse.e4.core.contexts.ContextInjectionFactory;
+import org.eclipse.e4.core.contexts.EclipseContextFactory;
+import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.services.IStylingEngine;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
@@ -43,7 +47,10 @@ import name.abuchen.portfolio.model.SecurityPrice;
 import name.abuchen.portfolio.model.Taxonomy;
 import name.abuchen.portfolio.money.CurrencyConverter;
 import name.abuchen.portfolio.money.CurrencyConverterImpl;
+import name.abuchen.portfolio.money.ExchangeRate;
 import name.abuchen.portfolio.money.ExchangeRateProviderFactory;
+import name.abuchen.portfolio.money.MonetaryOperator;
+import name.abuchen.portfolio.money.Money;
 import name.abuchen.portfolio.money.Values;
 import name.abuchen.portfolio.snapshot.filter.ClientFilter;
 import name.abuchen.portfolio.snapshot.security.SecurityPerformanceRecord;
@@ -91,6 +98,9 @@ import name.abuchen.portfolio.util.TextUtil;
 
 public class SecuritiesPerformanceView extends AbstractFinanceView implements ReportingPeriodListener
 {
+    @Inject
+    private IEclipseContext context;
+    
     private class FilterDropDown extends DropDown implements IMenuListener
     {
         private final Predicate<SecurityPerformanceRecord> sharesNotZero = record -> record.getSharesHeld() != 0;
@@ -453,7 +463,9 @@ public class SecuritiesPerformanceView extends AbstractFinanceView implements Re
             {
                 double latestQuote = previous.get().getLeft().getValue();
                 double previousQuote = previous.get().getRight().getValue();
-                return (latestQuote - previousQuote) / previousQuote;
+                if (previous.get().getLeft().getDate().atStartOfDay().compareTo(LocalDate.now().atStartOfDay()) != 0)
+                    return (double) 0;
+                return ((latestQuote - previousQuote) / previousQuote);
             }
             else
             {
@@ -501,6 +513,12 @@ public class SecuritiesPerformanceView extends AbstractFinanceView implements Re
             double previousQuote2 = previous2.get().getRight().getValue();
             double v2 = (latestQuote2 - previousQuote2) / previousQuote2;
 
+            if (previous1.get().getLeft().getDate().atStartOfDay().compareTo(LocalDate.now().atStartOfDay()) != 0)
+                v1 = (double) 0;
+
+            if (previous2.get().getLeft().getDate().atStartOfDay().compareTo(LocalDate.now().atStartOfDay()) != 0)
+                v2 = (double) 0;
+
             return Double.compare(v1, v2);
         }));
         recordColumns.addColumn(column);
@@ -514,9 +532,7 @@ public class SecuritiesPerformanceView extends AbstractFinanceView implements Re
                             .getLatestTwoSecurityPrices();
             if (previous.isPresent())
             {
-                double latestQuote = previous.get().getLeft().getValue();
-                double previousQuote = previous.get().getRight().getValue();
-                return (long) (latestQuote - previousQuote);
+                return calculateAbsoluteDiff(element, previous);
             }
             else
             {
@@ -555,16 +571,37 @@ public class SecuritiesPerformanceView extends AbstractFinanceView implements Re
                 return -1;
             if (previous1.isPresent() && !previous2.isPresent())
                 return 1;
+            
+            
+            double diff1 = calculateAbsoluteDiff(o1, previous1);
+            double diff2 = calculateAbsoluteDiff(o2, previous2);
+/*
+            double shareHeld1 = ((SecurityPerformanceRecord) o1).getSharesHeld() / Values.Share.divider();
+            double shareHeld2 = ((SecurityPerformanceRecord) o2).getSharesHeld() / Values.Share.divider();
 
+            ExchangeRateProviderFactory exRate = ContextInjectionFactory.make(ExchangeRateProviderFactory.class, this.context);
+            CurrencyConverterImpl a = new CurrencyConverterImpl(exRate, getClient().getBaseCurrency());
+
+            ExchangeRate rate1 = a.getRate(LocalDate.now(), ((SecurityPerformanceRecord) o1).getSecurity().getCurrencyCode());
+            BigDecimal rateVal1 = rate1.getValue();
+            
+            ExchangeRate rate2 = a.getRate(LocalDate.now(), ((SecurityPerformanceRecord) o2).getSecurity().getCurrencyCode());
+            BigDecimal rateVal2 = rate2.getValue();
+            
             double latestQuote1 = previous1.get().getLeft().getValue();
             double previousQuote1 = previous1.get().getRight().getValue();
-            double v1 = latestQuote1 - previousQuote1;
+            double v1 = (latestQuote1 - previousQuote1) * shareHeld1 * rateVal1.doubleValue();
 
             double latestQuote2 = previous2.get().getLeft().getValue();
             double previousQuote2 = previous2.get().getRight().getValue();
-            double v2 = latestQuote2 - previousQuote2;
+            double v2 = (latestQuote2 - previousQuote2) * shareHeld2 * rateVal2.doubleValue();
 
-            return Double.compare(v1, v2);
+            if (previous1.get().getLeft().getDate().atStartOfDay().compareTo(LocalDate.now().atStartOfDay()) != 0)
+                v1 = 0;
+            if (previous2.get().getLeft().getDate().atStartOfDay().compareTo(LocalDate.now().atStartOfDay()) != 0)
+                v2 = 0;
+*/
+            return Double.compare(diff1, diff2);
         }));
         recordColumns.addColumn(column);
 
@@ -634,6 +671,23 @@ public class SecuritiesPerformanceView extends AbstractFinanceView implements Re
         column.getEditingSupport().addListener(new TouchClientListener(getClient()));
         column.setVisible(false);
         recordColumns.addColumn(column);
+    }
+
+    private Long calculateAbsoluteDiff(Object element, Optional<Pair<SecurityPrice, SecurityPrice>> previous)
+    {
+        ExchangeRateProviderFactory exRate = ContextInjectionFactory.make(ExchangeRateProviderFactory.class, this.context);
+        CurrencyConverterImpl a = new CurrencyConverterImpl(exRate, getClient().getBaseCurrency());
+        ExchangeRate currentRate = a.getRate(LocalDate.now(), ((SecurityPerformanceRecord) element).getSecurity().getCurrencyCode());
+        ExchangeRate ratePreviousDay = a.getRate(LocalDate.now().minusDays(1).atTime(23, 59, 59), ((SecurityPerformanceRecord) element).getSecurity().getCurrencyCode());
+        
+        long shares = (long) (((SecurityPerformanceRecord) element).getSharesHeld() / Values.Share.divider());
+        double latestAbsoluteValue = shares * previous.get().getLeft().getValue() * currentRate.getValue().doubleValue();
+        double previousAbsoluteValue = shares * previous.get().getRight().getValue() * ratePreviousDay.getValue().doubleValue();
+        
+        if (previous.get().getLeft().getDate().atStartOfDay().compareTo(LocalDate.now().atStartOfDay()) != 0)
+            previousAbsoluteValue = shares * previous.get().getLeft().getValue() * ratePreviousDay.getValue().doubleValue();
+
+        return (long)(latestAbsoluteValue - previousAbsoluteValue) ;
     }
 
     private void addPerformanceColumns()

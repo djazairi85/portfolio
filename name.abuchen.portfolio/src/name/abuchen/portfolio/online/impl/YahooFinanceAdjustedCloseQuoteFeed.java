@@ -1,11 +1,13 @@
 package name.abuchen.portfolio.online.impl;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import name.abuchen.portfolio.Messages;
+import java.util.Calendar;
 
 public class YahooFinanceAdjustedCloseQuoteFeed extends YahooFinanceQuoteFeed
 {
@@ -24,6 +26,7 @@ public class YahooFinanceAdjustedCloseQuoteFeed extends YahooFinanceQuoteFeed
     @Override
     protected JSONArray extractQuotesArray(JSONObject indicators) throws IOException
     {
+        
         JSONArray quotes = (JSONArray) indicators.get("adjclose"); //$NON-NLS-1$
         if (quotes == null || quotes.isEmpty())
             throw new IOException();

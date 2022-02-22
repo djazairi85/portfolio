@@ -177,6 +177,7 @@ public class Account implements TransactionOwner<AccountTransaction>, Investment
                             }
                         }).sum();
     }
+    
 
     @Override
     public String toString()

@@ -1,9 +1,12 @@
 package name.abuchen.portfolio.model;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
+import name.abuchen.portfolio.money.Values;
 
 public class Portfolio implements Named, TransactionOwner<PortfolioTransaction>, Attributable
 {
@@ -151,5 +154,21 @@ public class Portfolio implements Named, TransactionOwner<PortfolioTransaction>,
     public String toString()
     {
         return name;
+    }
+    
+    public long getCurrentShares(LocalDateTime date, Security security)
+    {
+        return transactions.stream() //
+                        .filter(t -> t.getSecurity() != null && t.getSecurity().getTickerSymbol() == security.getTickerSymbol() && t.getDateTime().isBefore(date)) //
+                        .mapToLong(t -> {
+                            switch (t.getType())
+                            {
+                                case SELL:
+                                    return (long)((long)-t.getShares() / Values.Share.divider());
+                                case BUY:
+                                    return (long)((long)t.getShares() / Values.Share.divider());
+                                default: return 0;
+                            }
+                        }).sum();
     }
 }

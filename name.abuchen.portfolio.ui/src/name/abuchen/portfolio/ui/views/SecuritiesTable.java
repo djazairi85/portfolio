@@ -357,6 +357,9 @@ public final class SecuritiesTable implements ModificationListener
             Optional<Pair<SecurityPrice, SecurityPrice>> previous = ((Security) element).getLatestTwoSecurityPrices();
             if (previous.isPresent())
             {
+                if(previous.get().getLeft().getDate().atStartOfDay().compareTo(LocalDate.now().atStartOfDay()) != 0)
+                    return (double)0;
+                
                 double latestQuote = previous.get().getLeft().getValue();
                 double previousQuote = previous.get().getRight().getValue();
                 return (latestQuote - previousQuote) / previousQuote;
@@ -395,7 +398,7 @@ public final class SecuritiesTable implements ModificationListener
                 return -1;
             if (previous1.isPresent() && !previous2.isPresent())
                 return 1;
-
+            
             double latestQuote1 = previous1.get().getLeft().getValue();
             double previousQuote1 = previous1.get().getRight().getValue();
             double v1 = (latestQuote1 - previousQuote1) / previousQuote1;
@@ -404,6 +407,11 @@ public final class SecuritiesTable implements ModificationListener
             double previousQuote2 = previous2.get().getRight().getValue();
             double v2 = (latestQuote2 - previousQuote2) / previousQuote2;
 
+            if(previous1.get().getLeft().getDate().atStartOfDay().compareTo(LocalDate.now().atStartOfDay()) != 0)
+                v1 = (double)0;
+            if(previous2.get().getLeft().getDate().atStartOfDay().compareTo(LocalDate.now().atStartOfDay()) != 0)
+                v2 = (double)0;
+            
             return Double.compare(v1, v2);
         }));
         support.addColumn(column);
