@@ -89,7 +89,7 @@ public final class UpdateDividendsJob extends AbstractClientJob
                         }
                         
                         long sharesAtDate = getClient().getActivePortfolios().get(0).getCurrentShares(dividendEvent.getDate().atStartOfDay(), security);
-                        Optional<Account> account = getClient().getActiveAccounts().stream().filter(a -> a.getCurrencyCode() == security.getCurrencyCode()).findFirst();
+                        Optional<Account> account = getClient().getActiveAccounts().stream().filter(a -> a.getCurrencyCode() == security.getCurrencyCode() && !a.getName().toLowerCase().contains("crypto")).findFirst();
                         
                         if(account.isPresent())
                         {

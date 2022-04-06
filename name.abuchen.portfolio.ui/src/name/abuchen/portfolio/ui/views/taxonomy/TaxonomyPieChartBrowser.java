@@ -96,8 +96,9 @@ public class TaxonomyPieChartBrowser implements IPieChart
             }
             else
             {
+                String percentLabel = Values.Percent2.format(actual / (double) total.getAmount());
                 buffer.append("{\"uuid\":\"").append(node.getId());
-                buffer.append("\",\"name\":\"").append(name);
+                buffer.append("\",\"name\":\"").append(name + " (" + percentLabel + ")");
                 buffer.append("\",\"caption\":\"");
                 buffer.append(name).append(" ").append(Values.Amount.format(actual)).append(" (")
                                 .append(Values.Percent2.format(actual / (double) base)).append(totalPercentage)

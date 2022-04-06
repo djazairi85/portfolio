@@ -319,6 +319,7 @@ public class SecuritiesPerformanceView extends AbstractFinanceView implements Re
                 return true;
             }
         });
+        
 
         stylingEngine.style(records.getTable());
 
@@ -457,14 +458,15 @@ public class SecuritiesPerformanceView extends AbstractFinanceView implements Re
         column = new Column("5", Messages.ColumnChangeOnPrevious, SWT.RIGHT, 60); //$NON-NLS-1$
         column.setMenuLabel(Messages.ColumnChangeOnPrevious_MenuLabel);
         column.setLabelProvider(new NumberColorLabelProvider<>(Values.Percent2, element -> {
-            Optional<Pair<SecurityPrice, SecurityPrice>> previous = ((SecurityPerformanceRecord) element).getSecurity()
-                            .getLatestTwoSecurityPrices();
+            LocalDate yesterday = LocalDate.now().minusDays(1);
+            SecurityPerformanceRecord record = ((SecurityPerformanceRecord) element);
+            
+            Optional<Pair<SecurityPrice, SecurityPrice>> previous = Optional.of(new Pair<SecurityPrice, SecurityPrice>(record.getLatestSecurityPrice(), record.getSecurity().getSecurityPrice(yesterday))); 
+                            
             if (previous.isPresent())
             {
                 double latestQuote = previous.get().getLeft().getValue();
                 double previousQuote = previous.get().getRight().getValue();
-                if (previous.get().getLeft().getDate().atStartOfDay().compareTo(LocalDate.now().atStartOfDay()) != 0)
-                    return (double) 0;
                 return ((latestQuote - previousQuote) / previousQuote);
             }
             else
@@ -493,11 +495,13 @@ public class SecuritiesPerformanceView extends AbstractFinanceView implements Re
         }));
         column.setSorter(ColumnViewerSorter.create((o1, o2) -> { // NOSONAR
 
-            Optional<Pair<SecurityPrice, SecurityPrice>> previous1 = ((SecurityPerformanceRecord) o1).getSecurity()
-                            .getLatestTwoSecurityPrices();
-            Optional<Pair<SecurityPrice, SecurityPrice>> previous2 = ((SecurityPerformanceRecord) o2).getSecurity()
-                            .getLatestTwoSecurityPrices();
-
+            LocalDate yesterday = LocalDate.now().minusDays(1);
+            SecurityPerformanceRecord record = ((SecurityPerformanceRecord) o1);
+            SecurityPerformanceRecord record2 = ((SecurityPerformanceRecord) o2);
+            
+            Optional<Pair<SecurityPrice, SecurityPrice>> previous1 = Optional.of(new Pair<SecurityPrice, SecurityPrice>(record.getLatestSecurityPrice(), record.getSecurity().getSecurityPrice(yesterday)));
+            Optional<Pair<SecurityPrice, SecurityPrice>> previous2 = Optional.of(new Pair<SecurityPrice, SecurityPrice>(record2.getLatestSecurityPrice(), record2.getSecurity().getSecurityPrice(yesterday)));
+            
             if (!previous1.isPresent() && !previous2.isPresent())
                 return 0;
             if (!previous1.isPresent() && previous2.isPresent())
@@ -512,13 +516,7 @@ public class SecuritiesPerformanceView extends AbstractFinanceView implements Re
             double latestQuote2 = previous2.get().getLeft().getValue();
             double previousQuote2 = previous2.get().getRight().getValue();
             double v2 = (latestQuote2 - previousQuote2) / previousQuote2;
-
-            if (previous1.get().getLeft().getDate().atStartOfDay().compareTo(LocalDate.now().atStartOfDay()) != 0)
-                v1 = (double) 0;
-
-            if (previous2.get().getLeft().getDate().atStartOfDay().compareTo(LocalDate.now().atStartOfDay()) != 0)
-                v2 = (double) 0;
-
+ 
             return Double.compare(v1, v2);
         }));
         recordColumns.addColumn(column);
@@ -528,8 +526,11 @@ public class SecuritiesPerformanceView extends AbstractFinanceView implements Re
         column.setMenuLabel(Messages.ColumnChangeOnPrevious_MenuLabelAmount);
 
         column.setLabelProvider(new NumberColorLabelProvider<>(Values.CalculatedQuote, element -> {
-            Optional<Pair<SecurityPrice, SecurityPrice>> previous = ((SecurityPerformanceRecord) element).getSecurity()
-                            .getLatestTwoSecurityPrices();
+            LocalDate yesterday = LocalDate.now().minusDays(1);
+            SecurityPerformanceRecord record = ((SecurityPerformanceRecord) element);
+            
+            Optional<Pair<SecurityPrice, SecurityPrice>> previous = Optional.of(new Pair<SecurityPrice, SecurityPrice>(record.getLatestSecurityPrice(), record.getSecurity().getSecurityPrice(yesterday))); 
+                  
             if (previous.isPresent())
             {
                 return calculateAbsoluteDiff(element, previous);
@@ -560,10 +561,12 @@ public class SecuritiesPerformanceView extends AbstractFinanceView implements Re
         }));
         column.setSorter(ColumnViewerSorter.create((o1, o2) -> { // NOSONAR
 
-            Optional<Pair<SecurityPrice, SecurityPrice>> previous1 = ((SecurityPerformanceRecord) o1).getSecurity()
-                            .getLatestTwoSecurityPrices();
-            Optional<Pair<SecurityPrice, SecurityPrice>> previous2 = ((SecurityPerformanceRecord) o2).getSecurity()
-                            .getLatestTwoSecurityPrices();
+            LocalDate yesterday = LocalDate.now().minusDays(1);
+            SecurityPerformanceRecord record1 = ((SecurityPerformanceRecord) o1);
+            SecurityPerformanceRecord record2 = ((SecurityPerformanceRecord) o2);
+            
+            Optional<Pair<SecurityPrice, SecurityPrice>> previous1 = Optional.of(new Pair<SecurityPrice, SecurityPrice>(record1.getLatestSecurityPrice(), record1.getSecurity().getSecurityPrice(yesterday)));
+            Optional<Pair<SecurityPrice, SecurityPrice>> previous2 = Optional.of(new Pair<SecurityPrice, SecurityPrice>(record2.getLatestSecurityPrice(), record2.getSecurity().getSecurityPrice(yesterday)));
 
             if (!previous1.isPresent() && !previous2.isPresent())
                 return 0;
@@ -683,10 +686,7 @@ public class SecuritiesPerformanceView extends AbstractFinanceView implements Re
         long shares = (long) (((SecurityPerformanceRecord) element).getSharesHeld() / Values.Share.divider());
         double latestAbsoluteValue = shares * previous.get().getLeft().getValue() * currentRate.getValue().doubleValue();
         double previousAbsoluteValue = shares * previous.get().getRight().getValue() * ratePreviousDay.getValue().doubleValue();
-        
-        if (previous.get().getLeft().getDate().atStartOfDay().compareTo(LocalDate.now().atStartOfDay()) != 0)
-            previousAbsoluteValue = shares * previous.get().getLeft().getValue() * ratePreviousDay.getValue().doubleValue();
-
+         
         return (long)(latestAbsoluteValue - previousAbsoluteValue) ;
     }
 
