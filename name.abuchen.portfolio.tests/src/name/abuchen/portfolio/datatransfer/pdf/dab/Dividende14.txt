@@ -1,57 +1,88 @@
 PDFBox Version: 1.8.16
+Portfolio Performance Version: 0.59.1
 -----------------------------------------
-BELEGDRUCK=J
-ORIGINAL=1
-FAXVERSAND=N
-EMAILVERSAND=N
- 
-DEPOTNUMMER=1234567890
-DEPOTUNTERBEZEICHNUNG=
-          
-Erträgnisgutschrift VERSANDARTENSCHLUESSEL=DRUCKADRESSZEILE1=Herr
-aus Wertpapieren ADRESSZEILE2=Vorname Nachname
-ADRESSZEILE3=Straße 123
-Dividende für ADRESSZEILE4=12345 Stadt
-ADRESSZEILE5=
-Herr 0 1.01.2013 - 31.12.2013 ADRESSZEILE6=
-Vorname Nachname Depot-Nr. Abrechnungs-Nr. BELEGNUMMER=19680
-Straße 123
-gen 1234567890 12345678 / 14.12.2013
-SEITENNUMMER=1
-12345 Stadt STEUERERSTATTUNG=N
-Depotinhaber
+Postfach 12 02  90002 Nürnberg
+Depotnummer: 0123456789
+1119275220/00
+Vermerk der Bank: 5104
+2
 Vorname Nachname
- 
-Dividendengutschrift
- 
-NV-Bescheinigung gemäß § 44a Abs. 1 Nr. 2 und Abs. 2
-Nr. 2 EStG München, 14.12.2013
- 
- 
-Gattungsbezeichnung ISIN
-McDonald's Corp. Registered Shares DL-,01 US5801351017
-Nominal Ex-Tag Zahltag Dividenden-Betrag pro Stück
-STK 20,000 27.11.2013 16.12.2013 USD 0,810000
- 
-Wert  Konto-Nr. Devisenkurs Betrag zu Ihren Gunsten  
-16.12.2013 1234567890 EUR/USD 1,3841 EUR 9,95
- 
- 
-Hinweise zur steuerlichen Verrechnung:
-ausländische Dividende EUR            11,704     
-US-Quellensteuer 15% USD             2,43     
-davon anrechenbare US-Quellensteuer  15% USD             2,430     
-zu versteuern  EUR              0,00     
- 
-Zahlungstag 16.12.2013
- 
-Jahressteuerbescheinigung folgt
- 
- 
- 
-Verwahrart: Girosammelverwahrung
-Dieser Beleg wird maschinell erstellt und daher nicht unterschrieben.
-DAB Bank AG > Landsberger Straße 300 > 80687 München > BLZ 701 204 00 > BIC (SWIFT-Code): DABBDEMMXXX > Tel. 0 89 / 88 95 - 60 00 > Sitz: München > AG München, HRB 118190 
-USt.-Ident.-Nr.: DE 161864563 > Aufsichtsratsvorsitzender: Dr. Theodor Weimer > Vorstand: Ernst Huber (Sprecher des Vorstands), Dr. Niklas Dieterich, Dr. Josef Zellner
- 
-3.31/ABREEREIERTR/GDBERTRG/019680/141213/040344
+Vorname Nachname2 Datum: 03.10.2022
+Strasse Seite: 1 von 3
+PLZ Ort
+Ertragsgutschrift
+Wertpapierbezeichnung WKN ISIN
+SIMON PROPERTY GROUP INC. Reg. Paired Shares DL-,0001 916647 US8288061091
+Bestand
+850 Stück
+Ertragsausschüttung je Anteil 1,75 USD Schlusstag 07.09.2022
+Brutto in USD 1.487,50 USD
+abzgl. Quellensteuer 15,00 % von 1.487,50 USD 223,13 USD
+Zwischensumme in USD 1.264,37 USD
+Devisenkurs 0,981000 USD / EUR
+Brutto in EUR 1.516,31 EUR
+Quellensteuer in EUR 227,45 EUR
+Zwischensumme in EUR 1.288,86 EUR
+abzgl. Kapitalertragsteuer 148,29 EUR
+abzgl. Solidaritätszuschlag 8,14 EUR
+abzgl. Kirchensteuer 13,34 EUR
+Netto zugunsten IBAN DE49 7603 0010 0111 1111 11 1.119,09 EUR
+Valuta 30.09.2022 BIC CSDBDE71XXX
+Anrechenbare Quellensteuer 0,2625 USD pro Stück 227,45 EUR
+Bitte beachten Sie die weiteren Informationen auf Seite 2.
+BNP Paribas Wealth Management ist ein Geschäftsbereich der BNP Paribas S.A. Niederlassung Deutschland (AG nach franz. Recht).
+Standort Frankfurt: Senckenberganlage 19, 60325 Frankfurt am Main, HRB Frankfurt am Main 40950, Fon +49 (0) 69 / 56 00 41-200
+Standort Nürnberg: Bahnhofstraße 55, 90402 Nürnberg, HRB Nürnberg 31129, Fon +49 (0) 911 / 369-20 00, Fax +49 (0) 911 / 369-10 00
+wealthmanagement-de@bnpparibas.com, www.wealthmanagement.bnpparibas.de, USt-IdNr. DE191528929
+Sitz der BNP Paribas S.A.: 16, boulevard des Italiens, 75009 Paris, Frankreich, Registergericht: R.C.S. Paris 662 042 449
+Président du Conseil dAdministration (Präsident des Verwaltungsrates): Jean Lemierre, Directeur Général (Generaldirektor): Jean-Laurent Bonnafé
+Depotnummer: 0123456789
+1119275220/00
+Vermerk der Bank: 5104
+2
+Datum: 03.10.2022
+Seite: 2 von 3
+Details zur Abrechnung
+Informationen zum Investmentsteuergesetz
+Ausschüttung gem. §2 Abs. 11 InvStG 1.516,31 EUR
+abzgl. Teilfreistellung 0,00 % von 1.516,31 EUR 0,00 EUR
+Ertragsausschüttung mit Teilfreistellung 1.516,31 EUR
+Steuerpflichtiger Gesamtertrag 1.516,31 EUR
+Mit Verrechnungstopf "Allgemein" verrechnet 0,00 EUR
+Mit Sparerpauschbetrag verrechnet 0,00 EUR
+Mit Quellensteuer verrechnet -909,80 EUR
+somit verrechnete Quellensteuer -227,45 EUR
+Bemessungsgrundlage für Kapitalertragsteuer 606,51 EUR
+Details zu den Verrechnungstöpfen
+Verrechnungstopf "Allgemein" vor der Abrechnung 0,00 EUR
+Mit Verrechnungstopf "Allgemein" verrechnet 0,00 EUR
+Verrechnungstopf "Allgemein" nach der Abrechnung 0,00 EUR
+Sparerpauschbetrag vor der Abrechnung 0,00 EUR
+Mit Sparerpauschbetrag verrechnet 0,00 EUR
+Sparerpauschbetrag nach der Abrechnung 0,00 EUR
+Verrechnungstopf "Quellensteuer" vor der Abrechnung 0,00 EUR
+Änderung Verrechnungstopf "Quellensteuer" 0,00 EUR
+Verrechnungstopf "Quellensteuer" nach der Abrechnung 0,00 EUR
+Depotnummer: 0123456789
+1119275220/00
+Vermerk der Bank: 5104
+2
+Datum: 03.10.2022
+Seite: 3 von 3
+Details zur Steuerberechnung
+Bemessungsgrundlage für Kapitalertragsteuer (Hälftige Aufteilung gem. § 51a Absatz 2c Satz 7 und § 2 Absatz 8 EStG)
+Inhaber 1 303,26 EUR
+Inhaber 2 303,25 EUR
+Bemessungsgrundlage für Kapitalertragsteuer gesamt 606,51 EUR
+Kapitalertragsteuer
+Inhaber 1 24,45 % von 303,26 EUR 74,15 EUR
+Inhaber 2 24,45 % von 303,25 EUR 74,14 EUR
+Kapitalertragsteuer gesamt 148,29 EUR
+Solidaritätszuschlag
+Inhaber 1 5,50 % von 74,15 EUR 4,07 EUR
+Inhaber 2 5,50 % von 74,14 EUR 4,07 EUR
+Solidaritätszuschlag gesamt 8,14 EUR
+Kirchensteuer
+Inhaber 1 9,00 % von 74,15 EUR 6,67 EUR
+Inhaber 2 9,00 % von 74,14 EUR 6,67 EUR
+Kirchensteuer gesamt 13,34 EUR

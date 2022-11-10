@@ -32,6 +32,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import name.abuchen.portfolio.Messages;
+import name.abuchen.portfolio.datatransfer.pdf.PDFExtractorUtils;
 import name.abuchen.portfolio.model.AccountTransaction;
 import name.abuchen.portfolio.model.BuySellEntry;
 import name.abuchen.portfolio.model.Client;
@@ -107,6 +108,7 @@ public class IBFlexStatementExtractor implements Extractor
         try
         {
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            dbFactory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
             dbFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
             Document doc = dBuilder.parse(f);
@@ -159,6 +161,10 @@ public class IBFlexStatementExtractor implements Extractor
 
     private class IBFlexStatementExtractorResult
     {
+        private static final String ASSETKEY_STOCK = "STK";
+        private static final String ASSETKEY_OPTION = "OPT";
+        private static final String ASSETKEY_FUTURE_OPTION = "FOP";
+        
         private Document document;
         private List<Exception> errors = new ArrayList<>();
         private List<Item> results = new ArrayList<>();
@@ -326,7 +332,7 @@ public class IBFlexStatementExtractor implements Extractor
         private Function<Element, Item> buildPortfolioTransaction = element -> {
             String assetCategory = element.getAttribute("assetCategory");
 
-            if (!Arrays.asList("STK", "OPT").contains(assetCategory))
+            if (!Arrays.asList(ASSETKEY_STOCK, ASSETKEY_OPTION, ASSETKEY_FUTURE_OPTION).contains(assetCategory))
                 return null;
 
             // Unused Information from Flexstatement Trades, to be used in the
@@ -395,6 +401,8 @@ public class IBFlexStatementExtractor implements Extractor
             transaction.setSecurity(this.getOrCreateSecurity(element, true));
 
             transaction.setNote(element.getAttribute("description"));
+
+            PDFExtractorUtils.fixGrossValueBuySell().accept(transaction);
 
             return new BuySellEntryItem(transaction);
         };
@@ -512,10 +520,9 @@ public class IBFlexStatementExtractor implements Extractor
                 {
                     fxRateToBase = new BigDecimal(1);
                 }
-                BigDecimal inverseRate = BigDecimal.ONE.divide(fxRateToBase, 10, RoundingMode.HALF_DOWN);
 
                 BigDecimal baseCurrencyMoney = BigDecimal.valueOf(amount.doubleValue() * Values.Amount.factor())
-                                .divide(inverseRate, RoundingMode.HALF_DOWN);
+                                .multiply(fxRateToBase);
                 transaction.setAmount(Math.round(baseCurrencyMoney.doubleValue()));
                 transaction.setCurrencyCode(ibAccountCurrency);
                 if (addUnit)
@@ -532,6 +539,45 @@ public class IBFlexStatementExtractor implements Extractor
             {
                 transaction.setAmount(Math.round(amount.doubleValue() * Values.Amount.factor()));
                 transaction.setCurrencyCode(currency);
+
+                if (addUnit && transaction.getSecurity() != null
+                                && !transaction.getSecurity().getCurrencyCode().equals(currency))
+                {
+                    // If the transaction currency is different from the
+                    // security currency (as stored in PP) we need to supply the
+                    // gross value in the security currency. We assume that the
+                    // security currency is the same that IB thinks of as base
+                    // currency for this transaction (fxRateToBase).
+                    String fxRateToBaseString = element.getAttribute("fxRateToBase");
+                    BigDecimal fxRateToBase;
+                    if (fxRateToBaseString != null && !fxRateToBaseString.isEmpty())
+                    {
+                        fxRateToBase = BigDecimal.valueOf(Double.parseDouble(fxRateToBaseString));
+                    }
+                    else
+                    {
+                        fxRateToBase = new BigDecimal(1);
+                    }
+                    // To back out the amount in the security currency we could
+                    // multiply with fxRateToBase. Instead, we calculate the
+                    // inverse rate and divide by it as we need to supply the
+                    // inverse rate for the gross value below (which converts
+                    // from security currency to original
+                    // transaction currency).
+                    BigDecimal inverseRate = BigDecimal.ONE.divide(fxRateToBase, 10, RoundingMode.HALF_DOWN);
+
+                    BigDecimal securityCurrencyMoney = BigDecimal.valueOf(amount.doubleValue() * Values.Amount.factor())
+                                    .divide(inverseRate, RoundingMode.HALF_DOWN);
+
+                    // Gross value with conversion information for the security
+                    // currency.
+                    Unit grossValue = new Unit(Unit.Type.GROSS_VALUE, transaction.getMonetaryAmount(),
+                                    Money.of(transaction.getSecurity().getCurrencyCode(),
+                                                    Math.round(securityCurrencyMoney.doubleValue())),
+                                    inverseRate);
+                    transaction.addUnit(grossValue);
+                }
+
             }
         }
 
@@ -616,7 +662,7 @@ public class IBFlexStatementExtractor implements Extractor
             String conID = element.getAttribute("conid");
             String description = element.getAttribute("description");
 
-            if ("OPT".equals(assetCategory))
+            if (Arrays.asList(ASSETKEY_OPTION, ASSETKEY_FUTURE_OPTION).contains(assetCategory))
             {
                 computedTickerSymbol = tickerSymbol.map(t -> t.replaceAll("\\s+", ""));
                 // e.g a put option for oracle: ORCL 171117C00050000
@@ -624,7 +670,7 @@ public class IBFlexStatementExtractor implements Extractor
                     quoteFeed = YahooFinanceQuoteFeed.ID;
             }
 
-            if ("STK".equals(assetCategory))
+            if (ASSETKEY_STOCK.equals(assetCategory))
             {
                 computedTickerSymbol = tickerSymbol;
                 if (!"USD".equals(currency))

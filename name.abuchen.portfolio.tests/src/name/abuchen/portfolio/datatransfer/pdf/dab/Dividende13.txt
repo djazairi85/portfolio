@@ -1,50 +1,63 @@
 PDFBox Version: 1.8.16
+Portfolio Performance Version: 0.59.1
 -----------------------------------------
-BELEGDRUCK=J
-ORIGINAL=1
-FAXVERSAND=N
-EMAILVERSAND=N
-DEPOTNUMMER=3333190001
-Erträgnisgutschrift aus Wertpapieren DEPOTUNTERBEZEICHNUNG=
-VERSANDARTENSCHLUESSEL=DRUCK
-ADRESSZEILE1=Herr
-ADRESSZEILE2=Heinzi Heinzchen
-Dividende für ADRESSZEILE3=Heinzstr. 1
-01.04.2021 - 31.03.2022 ADRESSZEILE4=12345 Heinzhut
-Depot-Nr. Abrechnungs-Nr. ADRESSZEILE5=
-3333190001 93130690 / 01.12.2021 ADRESSZEILE6=
-Herr BELEGNUMMER=6651
-Heinz Heinzchen SEITENNUMMER=1
-Heinzstr. 1 STEUERERSTATTUNG=N
-12345 Heinzhut ERSTATTUNGSFÄHIGEDepotinhaber
-Heinz Heinzchen
-München, 01.12.2021
-Dividendengutschrift
-Gattungsbezeichnung ISIN
-Nintendo Co. Ltd. Registered Shares o.N. JP3756600007
-Nominal Ex-Tag Zahltag Dividenden-Betrag pro Stück
-STK 1,000 29.09.2021 01.12.2021 JPY 620,000000
-Wert Konto-Nr. Devisenkurs Betrag zu Ihren Gunsten
-01.12.2021 1234567891 EUR/JPY 127,99 EUR 3,59
-Hinweise zur steuerlichen Verrechnung: vorher aktuell
-ausländische Dividende EUR 4,84
-ausländische Quellensteuer 15,315% JPY 95
-erstattungsfähige Quellensteuer 0,315% JPY 2
-anrechenbare Quellensteuer 15% EUR 0,73
-Aktienverlusttopf EUR 1.234,56 1.234,56
-allgemeiner Verlusttopf EUR 0,00 0,00
-Quellensteuertopf EUR 0,00 0,00
-zu versteuern EUR 1,92
-einbehaltene Kapitalertragsteuer EUR 0,48
-einbehaltener Solidaritätszuschlag EUR 0,03
-im laufenden Jahr einbehaltene Kapitalertragsteuer EUR 12345678,91
-im laufenden Jahr einbehaltener Solidaritätszuschlag EUR 123466789,99
-Kapitalertragsteuer, Solidaritätszuschlag und ggf. Kirchensteuer nach gemeldetem Kirchensteuersatz verrechnet mit dem
-Finanzamt Frankfurt/M. V-Höchst, Steuernummer 047/220/15370.
-Steuerlicher Stichtag: 01.12.2021
-Verwahrart: Wertpapierrechnung Lagerland: Japan
-Dieser Beleg wird maschinell erstellt und daher nicht unterschrieben.
-BNP Paribas S.A. Niederlassung Deutschland > Standort: München > Landsberger Straße 300 > 80687 München > Sitz: Nürnberg HRB Nürnberg 31129 > USt.-Ident-Nr.: DE 
-191528929 > Sitz der Hauptniederlassung der BNP Paribas S.A.: 16, boulevard des Italiens, 75009 Paris, Frankreich, Registergericht: R.C.S. Paris 662 042 449 > Président du 
-Conseil d‘Administration: Jean Lemierre, Directeur Général: Jean-Laurent Bonnafé
-3.17/ABREEREIERTR/GDBERTRG/006651/011221/014348
+Postfach 12 02  90002 Nürnberg
+Depotnummer: 0123456789
+1500225645/00
+Vermerk der Bank: 5104
+2
+Max Mustermann
+Musterstr. 3 Datum: 22.09.2022
+01234 Musterhausen Seite: 1 von 2
+Ertragsgutschrift
+Wertpapierbezeichnung WKN ISIN
+Prospect Capital Corp. Registered Shares DL -,001 A0B746 US74348T1025
+Bestand
+10.000 Stück
+Ertragsausschüttung je Anteil 0,06 USD Schlusstag 25.08.2022
+Brutto in USD 600,00 USD
+abzgl. Quellensteuer 15,00 % von 600,00 USD 89,99 USD
+Zwischensumme in USD 510,01 USD
+Devisenkurs 0,990800 USD / EUR
+Brutto in EUR 605,56 EUR
+Quellensteuer in EUR 90,82 EUR
+Zwischensumme in EUR 514,74 EUR
+abzgl. Kapitalertragsteuer 25,00 % von 242,27 EUR 60,57 EUR
+abzgl. Solidaritätszuschlag 5,50 % von 60,57 EUR 3,33 EUR
+Netto zugunsten IBAN DE90 1234 5678 1234 5678 90 450,84 EUR
+Valuta 21.09.2022 BIC DABBDEMMXXX
+Anrechenbare Quellensteuer 0,009 USD pro Stück 90,82 EUR
+Bitte beachten Sie die weiteren Informationen auf Seite 2.
+BNP Paribas Wealth Management ist ein Geschäftsbereich der BNP Paribas S.A. Niederlassung Deutschland (AG nach franz. Recht).
+Standort Frankfurt: Senckenberganlage 19, 60325 Frankfurt am Main, HRB Frankfurt am Main 40950, Fon +49 (0) 69 / 56 00 41-200
+Standort Nürnberg: Bahnhofstraße 55, 90402 Nürnberg, HRB Nürnberg 31129, Fon +49 (0) 911 / 369-20 00, Fax +49 (0) 911 / 369-10 00
+wealthmanagement-de@bnpparibas.com, www.wealthmanagement.bnpparibas.de, USt-IdNr. DE191528929
+Sitz der BNP Paribas S.A.: 16, boulevard des Italiens, 75009 Paris, Frankreich, Registergericht: R.C.S. Paris 662 042 449
+Président du Conseil dAdministration (Präsident des Verwaltungsrates): Jean Lemierre, Directeur Général (Generaldirektor): Jean-Laurent Bonnafé
+Depotnummer: 0123456789
+1500225645/00
+Vermerk der Bank: 5104
+2
+Datum: 22.09.2022
+Seite: 2 von 2
+Details zur Abrechnung
+Informationen zum Investmentsteuergesetz
+Ausschüttung gem. §2 Abs. 11 InvStG 605,56 EUR
+abzgl. Teilfreistellung 0,00 % von 605,56 EUR 0,00 EUR
+Ertragsausschüttung mit Teilfreistellung 605,56 EUR
+Steuerpflichtiger Gesamtertrag 605,56 EUR
+Mit Verrechnungstopf "Allgemein" verrechnet 0,00 EUR
+Mit Sparerpauschbetrag verrechnet 0,00 EUR
+Mit Quellensteuer verrechnet -363,30 EUR
+somit verrechnete Quellensteuer -90,82 EUR
+Bemessungsgrundlage für Kapitalertragsteuer gesamt 242,27 EUR
+Details zu den Verrechnungstöpfen
+Verrechnungstopf "Allgemein" vor der Abrechnung 0,00 EUR
+Mit Verrechnungstopf "Allgemein" verrechnet 0,00 EUR
+Verrechnungstopf "Allgemein" nach der Abrechnung 0,00 EUR
+Sparerpauschbetrag vor der Abrechnung 0,00 EUR
+Mit Sparerpauschbetrag verrechnet 0,00 EUR
+Sparerpauschbetrag nach der Abrechnung 0,00 EUR
+Verrechnungstopf "Quellensteuer" vor der Abrechnung 0,00 EUR
+Änderung Verrechnungstopf "Quellensteuer" 0,00 EUR
+Verrechnungstopf "Quellensteuer" nach der Abrechnung 0,00 EUR

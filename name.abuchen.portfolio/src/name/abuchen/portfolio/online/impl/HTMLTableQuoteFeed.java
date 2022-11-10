@@ -33,7 +33,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.UncheckedIOException;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.safety.Whitelist;
+import org.jsoup.safety.Safelist;
 import org.jsoup.select.Elements;
 
 import name.abuchen.portfolio.Messages;
@@ -195,6 +195,7 @@ public class HTMLTableQuoteFeed implements QuoteFeed
                             DateTimeFormatter.ofPattern("d MMM y", Locale.ENGLISH), //$NON-NLS-1$
                             DateTimeFormatter.ofPattern("EEEE, MMMM dd, yEEE, MMM dd, y", Locale.ENGLISH), //$NON-NLS-1$
                             DateTimeFormatter.ofPattern("yyyy.MM.dd."), //$NON-NLS-1$
+                            DateTimeFormatter.ofPattern("M/d/yyyy"), //$NON-NLS-1$
             };
         }
 
@@ -549,7 +550,7 @@ public class HTMLTableQuoteFeed implements QuoteFeed
         if (prices.isEmpty())
         {
             data.addError(new IOException(MessageFormat.format(Messages.MsgNoQuotesFoundInHTML, url,
-                            Jsoup.clean(document.html(), Whitelist.relaxed()))));
+                            Jsoup.clean(document.html(), Safelist.relaxed()))));
             return Collections.emptyList();
         }
 

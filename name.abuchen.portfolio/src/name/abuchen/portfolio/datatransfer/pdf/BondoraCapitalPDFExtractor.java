@@ -13,11 +13,6 @@ import name.abuchen.portfolio.money.Values;
 @SuppressWarnings("nls")
 public class BondoraCapitalPDFExtractor extends AbstractPDFExtractor
 {
-    static String ACCOUNT_STATEMENT_TRANSACTION_REGEX = "^(?<date>[\\d]{2}.[\\d]{2}.[\\d]{4}|[\\d]{4}.[\\d]{2}.[\\d]{2})\\s"
-                    + "(?<note>[^€\\d]*)(\\s[€]\\D|\\D)"
-                    + "(?<amount>[\\.'\\d\\s]+(,[\\d]{1,2})?)"
-                    + "(\\D*)([\\.'\\d\\s]+(,\\d+)*)(.{2})?$";
-
     public BondoraCapitalPDFExtractor(Client client)
     {
         super(client);
@@ -39,7 +34,7 @@ public class BondoraCapitalPDFExtractor extends AbstractPDFExtractor
         final DocumentType type = new DocumentType("(Zusammenfassung|Summary)");
         this.addDocumentTyp(type);
 
-        Block block = new Block(ACCOUNT_STATEMENT_TRANSACTION_REGEX);
+        Block block = new Block("^([\\d]{2}.[\\d]{2}.[\\d]{4}|[\\d]{4}.[\\d]{2}.[\\d]{2}) .*$");
         type.addBlock(block);
 
         Transaction<AccountTransaction> pdfTransaction = new Transaction<>();
@@ -52,7 +47,16 @@ public class BondoraCapitalPDFExtractor extends AbstractPDFExtractor
         block.set(pdfTransaction);
         pdfTransaction
                 .section("date", "note", "amount")
-                .match(ACCOUNT_STATEMENT_TRANSACTION_REGEX)
+                .match("^(?<date>([\\d]{2}.[\\d]{2}.[\\d]{4}|[\\d]{4}.[\\d]{2}.[\\d]{2})) "
+                                + "(?<note>(.berweisen|"
+                                + "Transfer|"
+                                + "Abheben|"
+                                + "Go & Grow Zinsen|"
+                                + "Go & Grow returns|"
+                                + "Withdrawal)) "
+                                + "(\\p{Sc})?(\\W)?"
+                                + "(?<amount>[\\.,'\\d\\s]+)"
+                                + "(\\W)?(\\p{Sc})(\\W)?[\\.,'\\d\\s]+(\\W)?(\\p{Sc})?$")
                 .assign((t, v) -> {
                     t.setDateTime(asDate(v.get("date")));
                     t.setAmount(asAmount(v.get("amount")));
@@ -90,7 +94,7 @@ public class BondoraCapitalPDFExtractor extends AbstractPDFExtractor
     @Override
     protected long asAmount(String value)
     {
-        value = value.trim().replaceAll(" ", ""); //$NON-NLS-1$ //$NON-NLS-2$
+        value = value.trim().replaceAll("\\s", ""); //$NON-NLS-1$//$NON-NLS-2$
 
         String language = "de"; //$NON-NLS-1$
         String country = "DE"; //$NON-NLS-1$
@@ -100,18 +104,6 @@ public class BondoraCapitalPDFExtractor extends AbstractPDFExtractor
         {
             language = "de"; //$NON-NLS-1$
             country = "CH"; //$NON-NLS-1$
-        }
-        else
-        {
-            int lastDot = value.lastIndexOf("."); //$NON-NLS-1$
-            int lastComma = value.lastIndexOf(","); //$NON-NLS-1$
-    
-            // returns the greater of two int values
-            if (Math.max(lastDot, lastComma) == lastDot)
-            {
-                language = "en"; //$NON-NLS-1$
-                country = "US"; //$NON-NLS-1$
-            }
         }
 
         return PDFExtractorUtils.convertToNumberLong(value, Values.Amount, language, country);

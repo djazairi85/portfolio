@@ -2,6 +2,7 @@ package name.abuchen.portfolio.model;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.MessageFormat;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -82,10 +83,38 @@ public abstract class Transaction implements Annotated, Adaptable
                 long lower = Math.round(exchangeRate.add(BigDecimal.valueOf(-0.003))
                                 .multiply(BigDecimal.valueOf(forex.getAmount())).doubleValue());
 
+                // check for negative values
+                if (lower > upper)
+                {
+                    long temp = lower;
+                    lower = upper;
+                    upper = temp;
+                }
+
                 if (amount.getAmount() < lower || amount.getAmount() > upper)
-                    throw new IllegalArgumentException(MessageFormat.format(Messages.MsgErrorIllegalForexUnit,
-                                    type.toString(), Values.Money.format(forex), exchangeRate,
-                                    Values.Money.format(amount)));
+                {
+                    // do the reverse check b/c small currency amounts might not
+                    // allow for a better exchange rate
+
+                    upper = BigDecimal.valueOf(amount.getAmount() + 1).divide(exchangeRate, Values.MC)
+                                    .setScale(0, RoundingMode.HALF_EVEN).longValue();
+                    lower = BigDecimal.valueOf(amount.getAmount() - 1).divide(exchangeRate, Values.MC)
+                                    .setScale(0, RoundingMode.HALF_EVEN).longValue();
+
+                    if (lower > upper)
+                    {
+                        long temp = lower;
+                        lower = upper;
+                        upper = temp;
+                    }
+
+                    if (forex.getAmount() < lower || forex.getAmount() > upper)
+                    {
+                        throw new IllegalArgumentException(MessageFormat.format(Messages.MsgErrorIllegalForexUnit,
+                                        type.toString(), Values.Money.format(forex), exchangeRate,
+                                        Values.Money.format(amount)));
+                    }
+                }
             }
         }
 
@@ -159,12 +188,12 @@ public abstract class Transaction implements Annotated, Adaptable
 
             if (t1 instanceof AccountTransaction && t2 instanceof AccountTransaction)
             {
-                compareTo = ((AccountTransaction)t1).getType().compareTo(((AccountTransaction)t2).getType());
+                compareTo = ((AccountTransaction) t1).getType().compareTo(((AccountTransaction) t2).getType());
                 if (compareTo != 0)
                     return compareTo;
             }
 
-            return Integer.compare(t1.hashCode(), t2.hashCode());            
+            return Integer.compare(t1.hashCode(), t2.hashCode());
         }
     }
 
@@ -425,6 +454,8 @@ public abstract class Transaction implements Annotated, Adaptable
                                 return unit.getAmount().with(converter.at(date));
                         }));
     }
+
+    public abstract Money getGrossValue();
 
     public static final <E extends Transaction> List<E> sortByDate(List<E> transactions)
     {

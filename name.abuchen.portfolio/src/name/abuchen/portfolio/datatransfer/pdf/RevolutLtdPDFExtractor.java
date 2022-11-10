@@ -16,6 +16,11 @@ import name.abuchen.portfolio.money.Values;
 @SuppressWarnings("nls")
 public class RevolutLtdPDFExtractor extends AbstractPDFExtractor
 {
+    /***
+     * Information:
+     * The currency of Revolut Trading Ltd. is always USD.
+     */
+
     public RevolutLtdPDFExtractor(Client client)
     {
         super(client);
@@ -34,11 +39,6 @@ public class RevolutLtdPDFExtractor extends AbstractPDFExtractor
 
     private void addBuySellTransaction()
     {
-        /***
-         * Information:
-         * The currency of Revolut Trading Ltd. is always USD.
-         */
-
         DocumentType type = new DocumentType("Order details");
         this.addDocumentTyp(type);
 
@@ -59,16 +59,14 @@ public class RevolutLtdPDFExtractor extends AbstractPDFExtractor
                 .match("^.* (?<type>Sell) .*$")
                 .assign((t, v) -> {
                     if (v.get("type").equals("Sell"))
-                    {
                         t.setType(PortfolioTransaction.Type.SELL);
-                    }
                 })
 
                 // Symbol Company Type Quantity Price Execution time Execution venue
                 // TSLA Tesla Sell 2 1,166.121 01 Nov 2021 15:51:47 GMT XOFF
                 .section("tickerSymbol", "name", "isin", "shares", "date")
                 .find("Symbol Company ISIN Type Quantity Price Settlement date")
-                .match("^(?<tickerSymbol>.*) (?<name>.*) (?<isin>[\\w]{12}) Sell (?<shares>[\\.,\\d]+) \\D[\\.,\\d]+ (?<date>[\\d]{2} .* [\\d]{4})$")
+                .match("^(?<tickerSymbol>.*) (?<name>.*) (?<isin>[\\w]{12}) Sell (?<shares>[\\.,\\d]+) \\p{Sc}[\\.,\\d]+ (?<date>[\\d]{2} .* [\\d]{4})$")
                 .assign((t, v) -> {
                     v.put("currency", CurrencyUnit.USD);
                     t.setShares(asShares(v.get("shares")));
@@ -79,7 +77,7 @@ public class RevolutLtdPDFExtractor extends AbstractPDFExtractor
                 // TSLA Tesla US88160R1014 Sell 2.1451261 $1,166.12 03 Nov 2021
                 .section("amount")
                 .find("Symbol Company ISIN Type Quantity Price Settlement date")
-                .match("^.* [\\.,\\d]+ \\D(?<amount>[\\.,\\d]+) [\\d]{2} .* [\\d]{4}$")
+                .match("^.* [\\.,\\d]+ \\p{Sc}(?<amount>[\\.,\\d]+) [\\d]{2} .* [\\d]{4}$")
                 .assign((t, v) -> {
                     t.setAmount(asAmount(v.get("amount")));
                     t.setCurrencyCode(CurrencyUnit.USD);
@@ -90,25 +88,24 @@ public class RevolutLtdPDFExtractor extends AbstractPDFExtractor
         addFeesSectionsTransaction(pdfTransaction, type);
     }
 
+    /***
+     * Information:
+     * We cannot import in the bank statement the purchases, 
+     * sales, dividends, etc. because the amounts of price and 
+     * number of shares are not correctly reported.
+     */
     private void addAccountStatementTransaction()
     {
-        /***
-         * Information:
-         * We cannot import in the bank statement the purchases, 
-         * sales, dividends, etc. because the amounts of price and 
-         * number of shares are not correctly reported.
-         */
-
         DocumentType type = new DocumentType("Account Statement");
         this.addDocumentTyp(type);
 
-        /***
-         * Formatting:
-         * Trade Date | Settle Date | Currency | Activity Type | Symbol - Description | Quantity | Price Amount
-         * -------------------------------------
-         * 07/08/2020 07/08/2020 USD CDEP Cash Disbursement - Wallet (USD) 460.85
-         * 07/15/2020 07/15/2020 USD CDEP Cash Disbursement - Wallet (USD) 204.15
-         */
+        // @formatter:off
+        // Formatting:
+        // Trade Date | Settle Date | Currency | Activity Type | Symbol - Description | Quantity | Price Amount
+        // -------------------------------------
+        // 07/08/2020 07/08/2020 USD CDEP Cash Disbursement - Wallet (USD) 460.85
+        // 07/15/2020 07/15/2020 USD CDEP Cash Disbursement - Wallet (USD) 204.15
+        // @formatter:on
         Block blockDeposit = new Block("^[\\d]{2}\\/[\\d]{2}\\/[\\d]{4} [\\d]{2}\\/[\\d]{2}\\/[\\d]{4} [\\w]{3} .* Cash Disbursement \\- Wallet \\([\\w]{3}\\) [\\.,\\d]+$");
         type.addBlock(blockDeposit);
         blockDeposit.set(new Transaction<AccountTransaction>()
@@ -124,7 +121,7 @@ public class RevolutLtdPDFExtractor extends AbstractPDFExtractor
                         .assign((t, v) -> {
                             t.setDateTime(asDate(v.get("date"), Locale.UK));
                             t.setAmount(asAmount(v.get("amount")));
-                            t.setCurrencyCode(v.get("currency"));
+                            t.setCurrencyCode(asCurrencyCode(v.get("currency")));
                         })
 
                         .wrap(t -> {
@@ -139,7 +136,7 @@ public class RevolutLtdPDFExtractor extends AbstractPDFExtractor
         transaction
                 // Total Fee charged $0.02
                 .section("fee").optional()
-                .match("^Total Fee charged \\D(?<fee>[\\.,\\d]+)$")
+                .match("^Total Fee charged \\p{Sc}(?<fee>[\\.,\\d]+)$")
                 .assign((t, v) -> {
                     v.put("currency", CurrencyUnit.USD);
                     processFeeEntries(t, v, type);

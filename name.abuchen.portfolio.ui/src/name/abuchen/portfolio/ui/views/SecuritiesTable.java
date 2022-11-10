@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.text.MessageFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,6 +48,7 @@ import com.google.common.collect.Streams;
 
 import name.abuchen.portfolio.model.AccountTransaction;
 import name.abuchen.portfolio.model.Client;
+import name.abuchen.portfolio.model.InvestmentPlan;
 import name.abuchen.portfolio.model.PortfolioTransaction;
 import name.abuchen.portfolio.model.Security;
 import name.abuchen.portfolio.model.SecurityPrice;
@@ -75,6 +77,7 @@ import name.abuchen.portfolio.ui.jobs.UpdateQuotesJob;
 import name.abuchen.portfolio.ui.util.BookmarkMenu;
 import name.abuchen.portfolio.ui.util.Colors;
 import name.abuchen.portfolio.ui.util.ConfirmActionWithSelection;
+import name.abuchen.portfolio.ui.util.ContextMenu;
 import name.abuchen.portfolio.ui.util.LogoManager;
 import name.abuchen.portfolio.ui.util.SimpleAction;
 import name.abuchen.portfolio.ui.util.viewers.BooleanEditingSupport;
@@ -90,6 +93,8 @@ import name.abuchen.portfolio.ui.util.viewers.ReportingPeriodColumnOptions;
 import name.abuchen.portfolio.ui.util.viewers.ShowHideColumnHelper;
 import name.abuchen.portfolio.ui.util.viewers.StringEditingSupport;
 import name.abuchen.portfolio.ui.views.columns.AttributeColumn;
+import name.abuchen.portfolio.ui.views.columns.DistanceFromAllTimeHighColumn;
+import name.abuchen.portfolio.ui.views.columns.DistanceFromMovingAverageColumn;
 import name.abuchen.portfolio.ui.views.columns.IsinColumn;
 import name.abuchen.portfolio.ui.views.columns.NoteColumn;
 import name.abuchen.portfolio.ui.views.columns.SymbolColumn;
@@ -198,6 +203,9 @@ public final class SecuritiesTable implements ModificationListener
         addColumnDateOfLatestPrice();
         addColumnDateOfLatestHistoricalPrice();
         addQuoteDeltaColumn();
+        support.addColumn(new DistanceFromMovingAverageColumn(LocalDate::now));
+        support.addColumn(new DistanceFromAllTimeHighColumn(LocalDate::now,
+                        new ArrayList<>(view.getPart().getReportingPeriods())));
 
         for (Taxonomy taxonomy : getClient().getTaxonomies())
         {
@@ -210,7 +218,7 @@ public final class SecuritiesTable implements ModificationListener
         addQuoteFeedColumns();
         addDataQualityColumns();
 
-        support.createColumns();
+        support.createColumns(true);
 
         securities.getTable().setHeaderVisible(true);
         securities.getTable().setLinesVisible(true);
@@ -874,6 +882,7 @@ public final class SecuritiesTable implements ModificationListener
 
         Menu contextMenu = menuMgr.createContextMenu(securities.getTable());
         securities.getTable().setMenu(contextMenu);
+        securities.getTable().setData(ContextMenu.DEFAULT_MENU, contextMenu);
 
         securities.getTable().addDisposeListener(e -> {
             if (contextMenu != null)
@@ -919,6 +928,14 @@ public final class SecuritiesTable implements ModificationListener
                     markDirty();
                 }));
             }
+        }
+
+        // update quotes for multiple securities
+        if (selection.size() > 1)
+        {
+            manager.add(new SimpleAction(MessageFormat.format(Messages.SecurityMenuUpdateQuotesMultipleSecurities, selection.size()), a  ->            
+                new UpdateQuotesJob(getClient(), Arrays.stream(selection.toArray()).map(Security.class::cast).collect(Collectors.toList())).schedule()
+            ));
         }
 
         // if any retired security in selection, add "unretire/activate all"
@@ -1042,7 +1059,7 @@ public final class SecuritiesTable implements ModificationListener
 
         new OpenDialogAction(view, Messages.InvestmentPlanMenuCreate) //
                         .type(InvestmentPlanDialog.class) //
-                        .parameters(PortfolioTransaction.class) //
+                        .parameters(InvestmentPlan.Type.BUY_OR_DELIVERY) //
                         .with(security) //
                         .addTo(manager);
 

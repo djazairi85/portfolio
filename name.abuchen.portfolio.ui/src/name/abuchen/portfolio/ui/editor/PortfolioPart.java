@@ -15,6 +15,7 @@ import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.e4.core.contexts.ContextFunction;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.EclipseContextFactory;
@@ -423,6 +424,11 @@ public class PortfolioPart implements ClientInputListener
         this.clientInput.doSaveAs(shell, extension, flags);
     }
 
+    public void doExportAs(Shell shell, String extension, Set<SaveFlag> flags)
+    {
+        this.clientInput.doExportAs(shell, extension, flags);
+    }
+
     public ClientInput getClientInput()
     {
         return clientInput;
@@ -433,9 +439,20 @@ public class PortfolioPart implements ClientInputListener
         return clientInput.getClient();
     }
 
+    /**
+     * Returns the preferences store per data file.
+     */
     public IPreferenceStore getPreferenceStore()
     {
         return clientInput.getPreferenceStore();
+    }
+
+    /**
+     * Returns the eclipse preferences which exist per installation.
+     */
+    public IEclipsePreferences getEclipsePreferences()
+    {
+        return clientInput.getEclipsePreferences();
     }
 
     public List<ReportingPeriod> getReportingPeriods()
