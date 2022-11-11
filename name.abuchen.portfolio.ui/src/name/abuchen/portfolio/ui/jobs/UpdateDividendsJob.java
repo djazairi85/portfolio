@@ -1,7 +1,6 @@
 package name.abuchen.portfolio.ui.jobs;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -17,17 +16,14 @@ import org.eclipse.core.runtime.Status;
 import name.abuchen.portfolio.model.Account;
 import name.abuchen.portfolio.model.AccountTransaction;
 import name.abuchen.portfolio.model.Client;
-import name.abuchen.portfolio.model.PortfolioTransaction;
 import name.abuchen.portfolio.model.Security;
 import name.abuchen.portfolio.model.SecurityEvent;
-import name.abuchen.portfolio.model.AccountTransaction.Type;
 import name.abuchen.portfolio.model.SecurityEvent.DividendEvent;
 import name.abuchen.portfolio.model.Transaction.Unit;
 import name.abuchen.portfolio.money.Money;
 import name.abuchen.portfolio.money.Values;
 import name.abuchen.portfolio.online.DividendFeed;
 import name.abuchen.portfolio.online.Factory;
-import name.abuchen.portfolio.online.impl.DivvyDiaryDividendFeed;
 import name.abuchen.portfolio.online.impl.YahooFinanceDividendFeed;
 import name.abuchen.portfolio.ui.Messages;
 import name.abuchen.portfolio.ui.PortfolioPlugin;

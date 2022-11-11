@@ -8,24 +8,13 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
 import java.util.List;
-
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
-import org.osgi.framework.FrameworkUtil;
-
-import com.google.common.base.Strings;
 
 import name.abuchen.portfolio.model.Security;
 import name.abuchen.portfolio.model.SecurityEvent.DividendEvent;
 import name.abuchen.portfolio.money.Money;
 import name.abuchen.portfolio.money.Values;
 import name.abuchen.portfolio.online.DividendFeed;
-import name.abuchen.portfolio.util.WebAccess;
 
 public class YahooFinanceDividendFeed implements DividendFeed
 {

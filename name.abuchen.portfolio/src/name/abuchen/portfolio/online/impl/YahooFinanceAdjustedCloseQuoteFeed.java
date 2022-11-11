@@ -1,13 +1,10 @@
 package name.abuchen.portfolio.online.impl;
 
 import java.io.IOException;
-import java.math.BigDecimal;
-
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import name.abuchen.portfolio.Messages;
-import java.util.Calendar;
 
 public class YahooFinanceAdjustedCloseQuoteFeed extends YahooFinanceQuoteFeed
 {

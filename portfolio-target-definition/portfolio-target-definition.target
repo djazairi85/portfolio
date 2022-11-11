@@ -53,4 +53,10 @@
 		<unit id="org.eclipse.swtchart.feature.source.feature.group" version="0.13.0.202009151159"/>
 	</location>
 </locations>
+	<environment>
+		<os>win32</os>
+		<arch>x86_64</arch>
+		<ws>win32</ws>
+		<nl>fr_CH</nl>
+	</environment>
 </target>
