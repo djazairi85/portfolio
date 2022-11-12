@@ -96,6 +96,7 @@ public class StartupAddon
             try
             {
                 provider.update(monitor);
+                
             }
             catch (IOException e)
             {

@@ -27,6 +27,7 @@ public class IndicatorWidget<N extends Number> extends AbstractIndicatorWidget<N
         private boolean supportsBenchmarks = true;
         private Predicate<DataSeries> predicate;
         private boolean isValueColored = true;
+        private BiFunction<DataSeries, Interval, String> textProvider;
 
         public Builder(Widget widget, DashboardData dashboardData)
         {
@@ -57,6 +58,12 @@ public class IndicatorWidget<N extends Number> extends AbstractIndicatorWidget<N
             this.tooltip = tooltip;
             return this;
         }
+        
+        Builder<N> withTextProvider(BiFunction<DataSeries, Interval, String> textProvider)
+        {
+            this.textProvider = textProvider;
+            return this;
+        }
 
         Builder<N> withBenchmarkDataSeries(boolean supportsBenchmarks)
         {
@@ -81,6 +88,7 @@ public class IndicatorWidget<N extends Number> extends AbstractIndicatorWidget<N
             indicatorWidget.setProvider(provider);
             indicatorWidget.setTooltip(tooltip);
             indicatorWidget.setValueColored(isValueColored);
+            indicatorWidget.setTextProvider(textProvider);
             return indicatorWidget;
         }
     }
@@ -88,6 +96,8 @@ public class IndicatorWidget<N extends Number> extends AbstractIndicatorWidget<N
     private Values<N> formatter;
     private BiFunction<DataSeries, Interval, N> provider;
     private BiFunction<DataSeries, Interval, String> tooltip;
+    private BiFunction<DataSeries, Interval, String> textProvider;
+    
     private boolean isValueColored = true;
 
     public IndicatorWidget(Widget widget, DashboardData dashboardData, boolean supportsBenchmarks,
@@ -111,6 +121,11 @@ public class IndicatorWidget<N extends Number> extends AbstractIndicatorWidget<N
         this.provider = provider;
     }
 
+    void setTextProvider(BiFunction<DataSeries, Interval, String> textProvider)
+    {
+      this.textProvider = textProvider;  
+    }
+    
     void setTooltip(BiFunction<DataSeries, Interval, String> tooltip)
     {
         this.tooltip = tooltip;
@@ -145,8 +160,16 @@ public class IndicatorWidget<N extends Number> extends AbstractIndicatorWidget<N
     {
         super.update(value);
 
-        indicator.setText(formatter.format(value));
-
+        if(textProvider != null)
+        {
+            DataSeries ds = get(DataSeriesConfig.class).getDataSeries();
+            Interval rp = get(ReportingPeriodConfig.class).getReportingPeriod().toInterval(LocalDate.now());
+            indicator.setText(textProvider.apply(ds, rp));
+        }
+        else
+        {
+            indicator.setText(formatter.format(value));
+        }
         if (isValueColored)
             indicator.setTextColor(value.doubleValue() < 0 ? Colors.theme().redForeground()
                             : Colors.theme().greenForeground());

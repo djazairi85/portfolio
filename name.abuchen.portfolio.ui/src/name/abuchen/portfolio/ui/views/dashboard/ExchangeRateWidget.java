@@ -93,9 +93,9 @@ public class ExchangeRateWidget extends WidgetDelegate<Object>
 
         ReportingPeriod period = get(ReportingPeriodConfig.class).getReportingPeriod();
         ExchangeRateTimeSeries series = get(ExchangeRateSeriesConfig.class).getSeries();
-        Optional<ExchangeRate> rate = series.lookupRate(period.toInterval(LocalDate.now()).getEnd());
-
+        Optional<ExchangeRate> rate = series.lookupRate(period.toInterval(LocalDate.now()).getEnd());     
         this.indicator.setText(series.getBaseCurrency() + '/' + series.getTermCurrency() + ' '
-                        + (rate.isPresent() ? Values.ExchangeRate.format(rate.get().getValue()) : '-'));
+                        + (rate.isPresent() ? Values.ExchangeRate.format(rate.get().getValue()) : '-')
+                        );
     }
 }

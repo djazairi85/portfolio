@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
+import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.function.BiFunction;
 import java.util.stream.LongStream;
@@ -14,6 +15,7 @@ import name.abuchen.portfolio.math.Risk.Drawdown;
 import name.abuchen.portfolio.math.Risk.Volatility;
 import name.abuchen.portfolio.model.Dashboard;
 import name.abuchen.portfolio.model.Security;
+import name.abuchen.portfolio.model.SecurityPrice;
 import name.abuchen.portfolio.money.Money;
 import name.abuchen.portfolio.money.Values;
 import name.abuchen.portfolio.snapshot.ClientPerformanceSnapshot.CategoryType;
@@ -24,6 +26,7 @@ import name.abuchen.portfolio.ui.views.dashboard.heatmap.InvestmentHeatmapWidget
 import name.abuchen.portfolio.ui.views.dashboard.heatmap.PerformanceHeatmapWidget;
 import name.abuchen.portfolio.ui.views.dashboard.heatmap.YearlyPerformanceHeatmapWidget;
 import name.abuchen.portfolio.ui.views.dataseries.DataSeries;
+import name.abuchen.portfolio.util.Pair;
 
 public enum WidgetFactory
 {
@@ -260,19 +263,55 @@ public enum WidgetFactory
     FOLLOW_UP(Messages.SecurityListFilterDateReached, Messages.LabelCommon, FollowUpWidget::new),
 
     LATEST_SECURITY_PRICE(Messages.LabelSecurityLatestPrice, Messages.LabelCommon, //
-                    (widget, data) -> IndicatorWidget.<Long>create(widget, data) //
-                                    .with(Values.Quote) //
+                    (widget, data) -> IndicatorWidget.<Double>create(widget, data) //
+                                    .with(Values.Percent2)
                                     .with((ds, period) -> {
                                         if (!(ds.getInstance() instanceof Security))
-                                            return 0L;
+                                            return 0D;
 
                                         Security security = (Security) ds.getInstance();
 
-                                        return security.getSecurityPrice(LocalDate.now()).getValue();
+                                        Optional<Pair<SecurityPrice, SecurityPrice>> previous = security.getLatestTwoSecurityPrices();
+                                        if (previous.isPresent())
+                                        {
+                                            if(previous.get().getLeft().getDate().atStartOfDay().compareTo(LocalDate.now().atStartOfDay()) != 0)
+                                                return (double)0;
+                                            
+                                            double latestQuote = previous.get().getLeft().getValue();
+                                            double previousQuote = previous.get().getRight().getValue();
+                                            return (latestQuote - previousQuote) / previousQuote;
+                                        }
+                                        else
+                                        {
+                                            return null;
+                                        }
                                     }) //
                                     .withBenchmarkDataSeries(false) //
                                     .with(ds -> ds.getInstance() instanceof Security)
-                                    .withColoredValues(false) //
+                                    .withTextProvider((ds, period) -> {
+                                        if (!(ds.getInstance() instanceof Security))
+                                            return ""; //$NON-NLS-1$
+                                        Security security = (Security) ds.getInstance();
+                                        StringBuilder sb = new StringBuilder();
+
+                                        sb.append(Values.Quote.format(security.getSecurityPrice(LocalDate.now()).getValue()));
+                                        
+                                        Optional<Pair<SecurityPrice, SecurityPrice>> previous = security.getLatestTwoSecurityPrices();
+                                        if (previous.isPresent())
+                                        {
+                                            sb.append(" (");//$NON-NLS-1$
+                                            if(previous.get().getLeft().getDate().atStartOfDay().compareTo(LocalDate.now().atStartOfDay()) != 0)
+                                                sb.append(Values.Percent2.format(0D));
+                                            else
+                                            {
+                                                double latestQuote = previous.get().getLeft().getValue();
+                                                double previousQuote = previous.get().getRight().getValue();
+                                                sb.append(Values.Percent2.format((latestQuote - previousQuote) / previousQuote));
+                                            }
+                                            sb.append(")");//$NON-NLS-1$
+                                        }
+                                        return sb.toString();
+                                    })
                                     .withTooltip((ds, period) -> {
                                         if (!(ds.getInstance() instanceof Security))
                                             return ""; //$NON-NLS-1$
