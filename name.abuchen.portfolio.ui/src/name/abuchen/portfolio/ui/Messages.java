@@ -57,6 +57,7 @@ public class Messages extends NLS
     public static String BookmarksListView_title;
     public static String BookmarksListView_url;
     public static String BtnLabelApply;
+    public static String BtnLabelApplyAndClose;
     public static String BtnLabelOpenInvestmentPlanView;
     public static String BtnLabelRestartLater;
     public static String BtnLabelRestartNow;
@@ -515,6 +516,7 @@ public class Messages extends NLS
     public static String LabelBackupModeAbsoluteDirectory;
     public static String LabelBackupModeNextToFile;
     public static String LabelBackupModeRelativeDirectory;
+    public static String LabelBaseDataSeries;
     public static String LabelBeforeTaxAndFees;
     public static String LabelBenchmarks;
     public static String LabelBiggerSize;
@@ -691,6 +693,7 @@ public class Messages extends NLS
     public static String LabelQuote;
     public static String LabelQuoteFeed;
     public static String LabelQuoteFeedProvider;
+    public static String LabelRatio;
     public static String LabelRefresh;
     public static String LabelRemoveDividends;
     public static String LabelRemoveLogo;
@@ -1116,6 +1119,8 @@ public class Messages extends NLS
     public static String SecurityMenuExportCSV;
     public static String SecurityMenuImportCSV;
     public static String SecurityMenuImportHTML;
+    public static String SecurityMenuNewCryptocurrency;
+    public static String SecurityMenuNewCryptocurrencyMessage;
     public static String SecurityMenuNewExchangeRate;
     public static String SecurityMenuNewHICP;
     public static String SecurityMenuNewSecurity;
