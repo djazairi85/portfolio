@@ -9,15 +9,16 @@ import java.util.function.Supplier;
 import org.eclipse.swt.widgets.Composite;
 
 import name.abuchen.portfolio.model.Dashboard.Widget;
+import name.abuchen.portfolio.money.Money;
 import name.abuchen.portfolio.money.Values;
 import name.abuchen.portfolio.ui.util.Colors;
 import name.abuchen.portfolio.ui.util.InfoToolTip;
 import name.abuchen.portfolio.ui.views.dataseries.DataSeries;
 import name.abuchen.portfolio.util.Interval;
 
-public class IndicatorWidget<N extends Number> extends AbstractIndicatorWidget<N>
+public class IndicatorWidget<N> extends AbstractIndicatorWidget<N>
 {
-    public static class Builder<N extends Number>
+    public static class Builder<N>
     {
         private Widget widget;
         private DashboardData dashboardData;
@@ -106,7 +107,7 @@ public class IndicatorWidget<N extends Number> extends AbstractIndicatorWidget<N
         super(widget, dashboardData, supportsBenchmarks, predicate);
     }
 
-    public static <N extends Number> Builder<N> create(Widget widget, DashboardData dashboardData)
+    public static <N> Builder<N> create(Widget widget, DashboardData dashboardData)
     {
         return new IndicatorWidget.Builder<>(widget, dashboardData);
     }
@@ -160,18 +161,28 @@ public class IndicatorWidget<N extends Number> extends AbstractIndicatorWidget<N
     {
         super.update(value);
 
-        if(textProvider != null)
+        boolean isNegative = false;
+
+        if (value instanceof Money)
         {
-            DataSeries ds = get(DataSeriesConfig.class).getDataSeries();
-            Interval rp = get(ReportingPeriodConfig.class).getReportingPeriod().toInterval(LocalDate.now());
-            indicator.setText(textProvider.apply(ds, rp));
+            Money money = (Money) value;
+            indicator.setText(Values.Money.format(money, getDashboardData().getClient().getBaseCurrency()));
+            isNegative = money.isNegative();
+        }
+        else if (value instanceof Number)
+        {
+            indicator.setText(formatter.format(value));
+            isNegative = ((Number) value).doubleValue() < 0;
         }
         else
         {
             indicator.setText(formatter.format(value));
         }
+
         if (isValueColored)
-            indicator.setTextColor(value.doubleValue() < 0 ? Colors.theme().redForeground()
-                            : Colors.theme().greenForeground());
+        {
+            indicator.setTextColor(isNegative ? Colors.theme().redForeground() : Colors.theme().greenForeground());
+        }
+
     }
 }
