@@ -2,6 +2,7 @@ package name.abuchen.portfolio.ui.jobs;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
@@ -32,6 +33,7 @@ import name.abuchen.portfolio.util.WebAccess.WebAccessException;
 
 public final class UpdateQuotesJob extends AbstractClientJob
 {
+    private static final String LATESTUPDATE = "22:05";
     public enum Target
     {
         LATEST, HISTORIC
@@ -147,7 +149,11 @@ public final class UpdateQuotesJob extends AbstractClientJob
     protected IStatus run(IProgressMonitor monitor)
     {
         monitor.beginTask(Messages.JobLabelUpdating, IProgressMonitor.UNKNOWN);
-
+        if(java.time.LocalTime.now().isAfter(LocalTime.parse(LATESTUPDATE)))
+        {
+            return Status.CANCEL_STATUS;
+        }
+        
         List<Security> securities = getClient().getSecurities().stream().filter(filter).collect(Collectors.toList());
 
         Dirtyable dirtyable = new Dirtyable(getClient());
