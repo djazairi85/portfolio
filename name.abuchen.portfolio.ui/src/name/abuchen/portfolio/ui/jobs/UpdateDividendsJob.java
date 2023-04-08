@@ -61,8 +61,10 @@ public final class UpdateDividendsJob extends AbstractClientJob
             return 0.25;
         else if(ticker.contains(".L") || ticker.contains(".HK"))
             return 0;
-        else if(!ticker.contains(".") || ticker.contains(".AS"))
+        else if(!ticker.contains(".") || ticker.contains(".AS")|| ticker.contains(".TO"))
             return 0.15;
+        else if(ticker.contains(".DE"))
+            return 0.2638;
         else
             return 0.3;
     }
@@ -130,7 +132,8 @@ public final class UpdateDividendsJob extends AbstractClientJob
                                     at.setShares(Values.Share.factorize(sharesAtDate));
                                     //at.setAmount(val);
                                 }
-                            }/*
+                            }
+                            /*
                             else if(dividendTransaction.isPresent())
                             {
                                 if(dividendTransaction.get().getAmount() != val - tax)
