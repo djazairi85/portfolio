@@ -32,7 +32,12 @@ public class ClientIRRYield
         List<Double> values = new ArrayList<>();
         collectDatesAndValues(interval, snapshotStart, snapshotEnd, transactions, dates, values);
 
-        double irr = IRR.calculate(dates, values);
+        double irr = 0d;
+
+        // calculate IRR only if there any transaction or valuations at all.
+        // There might be none in the selected interval.
+        if (!values.isEmpty())
+            irr = IRR.calculate(dates, values);
 
         return new ClientIRRYield(irr);
     }
@@ -126,17 +131,15 @@ public class ClientIRRYield
         {
             dates.add(t.getDateTime().toLocalDate());
 
-            if (t instanceof AccountTransaction)
+            if (t instanceof AccountTransaction at)
             {
-                AccountTransaction at = (AccountTransaction) t;
                 long amount = converter.convert(t.getDateTime(), t.getMonetaryAmount()).getAmount();
                 if (at.getType() == Type.DEPOSIT || at.getType() == Type.TRANSFER_IN)
                     amount = -amount;
                 values.add(amount / Values.Amount.divider());
             }
-            else if (t instanceof PortfolioTransaction)
+            else if (t instanceof PortfolioTransaction pt)
             {
-                PortfolioTransaction pt = (PortfolioTransaction) t;
                 long amount = converter.convert(t.getDateTime(), t.getMonetaryAmount()).getAmount();
                 if (pt.getType() == PortfolioTransaction.Type.DELIVERY_INBOUND
                                 || pt.getType() == PortfolioTransaction.Type.TRANSFER_IN)

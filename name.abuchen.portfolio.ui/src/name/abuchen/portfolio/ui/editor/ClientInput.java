@@ -368,8 +368,7 @@ public class ClientInput
 
     public void createBackupAfterOpen()
     {
-        if (clientFile != null && preferences.getBoolean(UIConstants.Preferences.CREATE_BACKUP_BEFORE_SAVING, true)
-                        && preferences.getInt(UIConstants.Preferences.AUTO_SAVE_FILE, 0) == 0)
+        if (clientFile != null && preferences.getBoolean(UIConstants.Preferences.CREATE_BACKUP_BEFORE_SAVING, true))
             createBackup(clientFile, "backup-after-open"); //$NON-NLS-1$
     }
 
@@ -634,11 +633,11 @@ public class ClientInput
             {
                 for (Job j : regularJobs)
                 {
-                    if (j instanceof AutoSaveJob)
+                    if (j instanceof AutoSaveJob job)
                     {
-                        ((AutoSaveJob) j).setDelay(getAutoSavePrefs());
-                        ((AutoSaveJob) j).schedule(getAutoSavePrefs());
-                        ((AutoSaveJob) j).wakeUp(getAutoSavePrefs());
+                        job.setDelay(getAutoSavePrefs());
+                        job.schedule(getAutoSavePrefs());
+                        job.wakeUp(getAutoSavePrefs());
                     }
                 }
             }

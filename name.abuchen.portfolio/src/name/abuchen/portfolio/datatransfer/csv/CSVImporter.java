@@ -146,10 +146,10 @@ public final class CSVImporter
 
         public String toPattern()
         {
-            if (format instanceof SimpleDateFormat)
-                return ((SimpleDateFormat) format).toPattern();
-            else if (format instanceof DecimalFormat)
-                return ((DecimalFormat) format).toPattern();
+            if (format instanceof SimpleDateFormat dateFormat)
+                return dateFormat.toPattern();
+            else if (format instanceof DecimalFormat decimalFormat)
+                return decimalFormat.toPattern();
             else if (format instanceof ISINFormat)
                 return Isin.PATTERN;
             else if (format instanceof EnumMapFormat)
@@ -276,8 +276,10 @@ public final class CSVImporter
                         new DateFieldFormat(Messages.CSVFormatMMDDYY, "MM-dd-yy"), //$NON-NLS-1$
                         new DateFieldFormat(Messages.CSVFormatMMDDYYYY, "MM-dd-yyyy"), //$NON-NLS-1$
                         new DateFieldFormat(Messages.CSVFormatDDMMMYYYY, "dd-MMM-yyyy"), // NOSONAR //$NON-NLS-1$
+                        new DateFieldFormat(Messages.CSVFormatMMMDDYYYY, "MMM dd, yyyy"), //$NON-NLS-1$
                         new DateFieldFormat(Messages.CSVFormatDDMMMYYYY_German, "dd-MMM-yyyy", Locale.GERMAN), //$NON-NLS-1$
-                        new DateFieldFormat(Messages.CSVFormatDDMMMYYYY_English, "dd-MMM-yyyy", Locale.US) //$NON-NLS-1$
+                        new DateFieldFormat(Messages.CSVFormatDDMMMYYYY_English, "dd-MMM-yyyy", Locale.US), //$NON-NLS-1$
+                        new DateFieldFormat(Messages.CSVFormatYYYYMM, "yyyy-MM") //$NON-NLS-1$
         ));
 
         /* package */ DateField(String code, String name)
@@ -347,6 +349,12 @@ public final class CSVImporter
                                         NumberFormat.getInstance(Locale.GERMANY)),
                         new FieldFormat("0,000.00", Messages.CSVFormatNumberUS, //$NON-NLS-1$
                                         NumberFormat.getInstance(Locale.US)),
+                        new FieldFormat("0 000,00", Messages.CSVFormatNumberFrance, () -> { //$NON-NLS-1$
+                            DecimalFormatSymbols unusualSymbols = new DecimalFormatSymbols(Locale.FRANCE);
+                            unusualSymbols.setDecimalSeparator(',');
+                            unusualSymbols.setGroupingSeparator(' ');
+                            return new DecimalFormat("#,##0.###", unusualSymbols); //$NON-NLS-1$
+                        }),
                         new FieldFormat("0'000,00", Messages.CSVFormatApostrophe, () -> { //$NON-NLS-1$
                             DecimalFormatSymbols unusualSymbols = new DecimalFormatSymbols(Locale.US);
                             unusualSymbols.setGroupingSeparator('\'');
@@ -371,8 +379,10 @@ public final class CSVImporter
             // arbitrary number format patterns, map it to the available FORMAT
             // objects
 
-            if ("CH".equals(Locale.getDefault().getCountry())) //$NON-NLS-1$
+            if ("FR".equals(Locale.getDefault().getCountry())) //$NON-NLS-1$
                 return FORMATS.get(2);
+            if ("CH".equals(Locale.getDefault().getCountry())) //$NON-NLS-1$
+                return FORMATS.get(3);
             if (TextUtil.DECIMAL_SEPARATOR == ',')
                 return FORMATS.get(0);
             if (TextUtil.DECIMAL_SEPARATOR == '.')
