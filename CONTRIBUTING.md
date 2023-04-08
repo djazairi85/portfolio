@@ -13,6 +13,9 @@
 	- [Build with Maven](#build-with-maven)
 - [Contribute Code](#contribute-code)
 - [Translations](#translations)
+- [Images, Logo & Colors](#images-logo-and-color)
+	- [Color code & status](#color-code-and-status)
+	- [Format and size](#format-and-size)
 - [PDF Importer](#pdf-importer)
 	- [Source Location](#source-location)
 	- [Imported Transactions](#imported-transactions)
@@ -56,11 +59,19 @@ Optionally, install via the Eclipse Marketplace (drag and drop the *Install* but
 * [Checkstyle Plug-In](https://marketplace.eclipse.org/content/checkstyle-plug)
 * [SonarLint](https://marketplace.eclipse.org/content/sonarlint)
 * [Launch Configuration DSL](https://marketplace.eclipse.org/content/launch-configuration-dsl)
-* Eclipse e4 Tools Developer Resources
-	- `Menu` --> `Help` --> `Install New Software`
-	- Pick *Latest Eclipse Simultaneous Release* from the dropdown menu 
-	- Under *General Purpose Tools* select the *Eclipse e4 Tools Developer Resources*
 
+
+#### Install from the Simulatenous Release Update site:
+
+`Menu` --> `Help` --> `Install New Software`
+
+Pick `Latest Eclipse Simultaneous Release` from the dropdown menu.
+
+* M2E PDE Integration (skip if you installed the *Eclipse IDE for RCP and RAP Developers*)
+	- Under `General Purpose Tools` select the `M2E PDE Integration`
+* Eclipse e4 Tools Developer Resources
+	- Under `General Purpose Tools` select the `Eclipse e4 Tools Developer Resources`
+  
 
 ### Configure Eclipse
 
@@ -75,8 +86,8 @@ Configure the following preferences (`Menu` --> `Window` --> `Preferences`)
 * `Java` --> `Editor` --> `Content Assist` --> `Favorites`
 	- Click on `New Type...` and add the following favorites
 		- `name.abuchen.portfolio.util.TextUtil`
-		- `name.abuchen.portfolio.datatransfer.pdf.PDFExtractorUtils`
-* `Java` --> `Editor` --> `Installed JREs`
+		- `name.abuchen.portfolio.datatransfer.ExtractorUtils`
+* `Java` --> `Installed JREs`
 	- Add the Java 17 JDK
 
 
@@ -117,19 +128,20 @@ First, add the *Launch Configuration* view to your workspace:
 
 It is not required to use [Maven](https://maven.apache.org) as you can develop using the Eclipse IDE with the setup above. The Maven build is used for the [Github Actions](https://github.com/buchen/portfolio/actions) build.
 
-The Maven build works fine when `JAVA_HOME` points to an (Open-)JDK 11 installation.
+The Maven build works fine when `JAVA_HOME` points to an (Open-)JDK 17 installation.
 
 Linux/macOS
 ```
-export MAVEN_OPTS="-Xmx2g"
+export MAVEN_OPTS="-Xmx4g"
 mvn -f portfolio-app/pom.xml clean verify
 ```
 
 ```
-set MAVEN_OPTS="-Xmx2g"
+set MAVEN_OPTS="-Xmx4g"
 mvn -f portfolio-app\pom.xml -Denforcer.skip=true clean verify
 ````
 
+Hint: if you run into resolution problems, try deleting the ```~/.m2/repository/p2``` directory. Apparently, when switching to Maven Tycho 3, there are some layout changes.
 
 ## Contribute Code
 
@@ -155,6 +167,42 @@ When adding new labels,
 * use the formatting excactly as done by the Resource Bundle Editor 
 * use [DeepL](https://www.deepl.com) to translate new labels into all existing languages
 
+## Images, Logo and color
+
+Images and logos used must be subject to [Creative Commons CC0](https://creativecommons.org/publicdomain/zero/1.0/legalcode).
+
+We only use icon from [iconmonstr.com](https://iconmonstr.com).
+
+If a color change icon is used, the passive state is gray and the active state is orange.
+
+Please add all used images, logos and icons in the [Images](https://github.com/buchen/portfolio/blob/master/name.abuchen.portfolio.ui/src/name/abuchen/portfolio/ui/Images.java) file.
+
+### Format and size
+
+Images, logos and icons are to be created as Portable Network Graphic ([PNG](https://en.wikipedia.org/wiki/Portable_Network_Graphics)) format.
+
+* The background must be transparent.
+* The basic format is 16x16px.
+* A designation is to be chosen as name. (e.g. information.png)
+* The file name must be written in lower case letters.
+* It must be created in at least two sizes. 16x16px and 32x32px.
+
+Designation basic format as an example:
+
+* `information.png` (16x16px)
+* `information@2x.png` (32x32px)
+* ...
+
+### Color code and status
+
+| Color         | Color code (hex)	| Color code (RGB)	| Used for	|
+| :---------    | :----------- 		| :----------- 		| :----------- 		|
+| orange (logo) | ![#f18f01](https://placehold.co/15x15/f18f01/f18f01.png) `#f18f01`		| `rgb(241, 143, 1)`    | Activated (ex: filter)  |
+| blue (logo)   | ![#0e6e8e](https://placehold.co/15x15/0e6e8e/0e6e8e.png) `#0e6e8e`		| `rgb(14, 110, 142)`   |  	|
+| green (logo)  | ![#9ac155](https://placehold.co/15x15/9ac155/9ac155.png) `#9ac155`		| `rgb(154, 193, 85)`   |  	|
+| dark blue     | ![#95a4b3](https://placehold.co/15x15/95a4b3/95a4b3.png) `#95a4b3`   	| `rgb(149, 164, 179)`  | Default color for icons |
+| red         	| ![#d11d1d](https://placehold.co/15x15/d11d1d/d11d1d.png) `#d11d1d`		| `rgb(209, 29, 29)`      | Error, Fault            |
+| yellow       	| ![#ffd817](https://placehold.co/15x15/ffd817/ffd817.png) `#ffd817`		| `rgb(255, 216, 23)`   | Warning                 |
 
 ## PDF Importer
 
@@ -258,9 +306,9 @@ A finished PDF importer as a basis would be e.g. the [V-Bank AG](https://github.
 
 ### Auxiliary classes
 
-The utility class about standardized conversions, is called by the [AbstractPDFExtractor.java](https://github.com/buchen/portfolio/blob/master/name.abuchen.portfolio/src/name/abuchen/portfolio/datatransfer/pdf/AbstractPDFExtractor.java)
-and processed in the [PDFExtractorUtils.java](https://github.com/buchen/portfolio/blob/master/name.abuchen.portfolio/src/name/abuchen/portfolio/datatransfer/pdf/PDFExtractorUtils.java).
-The [PDFExchangeRate](https://github.com/buchen/portfolio/blob/8d86513b6a4dcd8af0348f73e1b9c7df8af2cd83/name.abuchen.portfolio/src/name/abuchen/portfolio/datatransfer/pdf/PDFExchangeRate.java) helps processing for foreign currencies.
+The utility class about standardized conversions, is called by the [AbstractPDFExtractor](https://github.com/buchen/portfolio/blob/master/name.abuchen.portfolio/src/name/abuchen/portfolio/datatransfer/pdf/AbstractPDFExtractor.java)
+and processed in the [ExtractorUtils](https://github.com/buchen/portfolio/blob/master/name.abuchen.portfolio/src/name/abuchen/portfolio/datatransfer/ExtractorUtils.java).
+The [ExtrExchangeRate](https://github.com/buchen/portfolio/blob/master/name.abuchen.portfolio/src/name/abuchen/portfolio/datatransfer/ExtrExchangeRate.java) helps processing for foreign currencies.
 
 Use the [Money](https://github.com/buchen/portfolio/blob/master/name.abuchen.portfolio/src/name/abuchen/portfolio/money/Money.java) class when working with amounts (it includes the currency and the value rounded to cents). Use *BigDecimal* for exchange rates and the conversion between currencies. 
 

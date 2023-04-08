@@ -1,6 +1,8 @@
 package name.abuchen.portfolio.online.impl;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.net.URISyntaxException;
 import java.text.MessageFormat;
 import java.text.ParseException;
@@ -44,12 +46,14 @@ public class GenericJSONQuoteFeed implements QuoteFeed
     public static final String CLOSE_PROPERTY_NAME_HISTORIC = "GENERIC-JSON-CLOSE"; //$NON-NLS-1$
     public static final String HIGH_PROPERTY_NAME_HISTORIC = "GENERIC-JSON-HIGH"; //$NON-NLS-1$
     public static final String LOW_PROPERTY_NAME_HISTORIC = "GENERIC-JSON-LOW"; //$NON-NLS-1$
+    public static final String FACTOR_PROPERTY_NAME_HISTORIC = "GENERIC-JSON-FACTOR"; //$NON-NLS-1$
     public static final String VOLUME_PROPERTY_NAME_HISTORIC = "GENERIC-JSON-VOLUME"; //$NON-NLS-1$
     public static final String DATE_PROPERTY_NAME_LATEST = "GENERIC-JSON-DATE-LATEST"; //$NON-NLS-1$
     public static final String DATE_FORMAT_PROPERTY_NAME_LATEST = "GENERIC-JSON-DATE-FORMAT-LATEST"; //$NON-NLS-1$
     public static final String CLOSE_PROPERTY_NAME_LATEST = "GENERIC-JSON-CLOSE-LATEST"; //$NON-NLS-1$
     public static final String HIGH_PROPERTY_NAME_LATEST = "GENERIC-JSON-HIGH-LATEST"; //$NON-NLS-1$
     public static final String LOW_PROPERTY_NAME_LATEST = "GENERIC-JSON-LOW-LATEST"; //$NON-NLS-1$
+    public static final String FACTOR_PROPERTY_NAME_LATEST = "GENERIC-JSON-FACTOR-LATEST"; //$NON-NLS-1$
     public static final String VOLUME_PROPERTY_NAME_LATEST = "GENERIC-JSON-VOLUME-LATEST"; //$NON-NLS-1$
 
     private final PageCache<String> cache = new PageCache<>();
@@ -103,6 +107,8 @@ public class GenericJSONQuoteFeed implements QuoteFeed
                         isLatest ? HIGH_PROPERTY_NAME_LATEST : HIGH_PROPERTY_NAME_HISTORIC);
         Optional<String> lowProperty = security.getPropertyValue(SecurityProperty.Type.FEED,
                         isLatest ? LOW_PROPERTY_NAME_LATEST : LOW_PROPERTY_NAME_HISTORIC);
+        Optional<String> factorProperty = security.getPropertyValue(SecurityProperty.Type.FEED,
+                        isLatest ? FACTOR_PROPERTY_NAME_LATEST : FACTOR_PROPERTY_NAME_HISTORIC);
         Optional<String> volumeProperty = security.getPropertyValue(SecurityProperty.Type.FEED,
                         isLatest ? VOLUME_PROPERTY_NAME_LATEST : VOLUME_PROPERTY_NAME_HISTORIC);
 
@@ -155,7 +161,7 @@ public class GenericJSONQuoteFeed implements QuoteFeed
 
             if (json != null)
                 newPricesByDate.addAll(parse(url, json, dateProperty.get(), closeProperty.get(), data,
-                                dateFormatProperty, lowProperty, highProperty, volumeProperty));
+                                dateFormatProperty, lowProperty, highProperty, factorProperty, volumeProperty));
 
             if (newPricesByDate.size() > sizeBefore)
                 failedAttempts = 0;
@@ -197,7 +203,7 @@ public class GenericJSONQuoteFeed implements QuoteFeed
 
     protected List<LatestSecurityPrice> parse(String url, String json, String datePath, String closePath,
                     QuoteFeedData data, Optional<String> dateFormat, Optional<String> lowPath,
-                    Optional<String> highPath, Optional<String> volumePath)
+                    Optional<String> highPath, Optional<String> factorString, Optional<String> volumePath)
     {
         try
         {
@@ -215,17 +221,17 @@ public class GenericJSONQuoteFeed implements QuoteFeed
             Optional<List<Object>> high = Optional.empty();
             Optional<List<Object>> low = Optional.empty();
             Optional<List<Object>> volume = Optional.empty();
-            if(highPath.isPresent())
+            if (highPath.isPresent())
             {
                 JsonPath highP = JsonPath.compile(highPath.get());
                 high = Optional.of(ctx.read(highP));
             }
-            if(lowPath.isPresent())
+            if (lowPath.isPresent())
             {
                 JsonPath lowP = JsonPath.compile(lowPath.get());
                 low = Optional.of(ctx.read(lowP));
             }
-            if(volumePath.isPresent())
+            if (volumePath.isPresent())
             {
                 JsonPath volumeP = JsonPath.compile(volumePath.get());
                 volume = Optional.of(ctx.read(volumeP));
@@ -236,6 +242,16 @@ public class GenericJSONQuoteFeed implements QuoteFeed
                 data.addError(new IOException(MessageFormat.format(
                                 Messages.MsgErrorNumberOfDateAndCloseRecordsDoNotMatch, dates.size(), close.size())));
                 return Collections.emptyList();
+            }
+
+            BigDecimal factor;
+            if (factorString.isPresent())
+            {
+                factor = new BigDecimal(factorString.get());
+            }
+            else
+            {
+                factor = BigDecimal.ONE;
             }
 
             List<LatestSecurityPrice> prices = new ArrayList<>();
@@ -252,27 +268,27 @@ public class GenericJSONQuoteFeed implements QuoteFeed
 
                 // close
                 object = close.get(index);
-                price.setValue(this.extractValue(object));
+                price.setValue(this.extractValue(object, factor));
 
                 if (price.getDate() != null && price.getValue() > 0)
                 {
-                    if(high.isPresent())
+                    if (high.isPresent())
                     {
-                        price.setHigh(this.extractValue(high.get().get(index)));
+                        price.setHigh(this.extractValue(high.get().get(index), factor));
                     }
                     else
                     {
                         price.setHigh(LatestSecurityPrice.NOT_AVAILABLE);
                     }
-                    if(low.isPresent())
+                    if (low.isPresent())
                     {
-                        price.setLow(this.extractValue(low.get().get(index)));
+                        price.setLow(this.extractValue(low.get().get(index), factor));
                     }
                     else
                     {
                         price.setLow(LatestSecurityPrice.NOT_AVAILABLE);
                     }
-                    if(volume.isPresent())
+                    if (volume.isPresent())
                     {
                         price.setVolume(this.extractIntegerValue(volume.get().get(index)));
                     }
@@ -293,49 +309,50 @@ public class GenericJSONQuoteFeed implements QuoteFeed
         }
     }
 
-    /* testing */ long extractValue(Object object) throws ParseException
+    /* testing */ long extractValue(Object object, BigDecimal factor) throws ParseException
     {
         if (object instanceof Number)
-            return Values.Quote.factorize(((Number) object).doubleValue());
-        else if (object instanceof String)
-            return YahooHelper.asPrice((String) object);
+            return new BigDecimal(object.toString()).multiply(factor).multiply(Values.Quote.getBigDecimalFactor())
+                            .setScale(0, RoundingMode.HALF_UP).longValue();
+        else if (object instanceof String s)
+            return YahooHelper.asPrice(s, factor);
         return 0;
     }
 
     /* testing */ long extractIntegerValue(Object object) throws ParseException
     {
-        if (object instanceof String)
+        if (object instanceof String s)
             try
             {
-                return Long.parseLong((String) object);
+                return Long.parseLong(s);
             }
-            catch(NumberFormatException e)
+            catch (NumberFormatException e)
             {
                 // try again as Double
                 return Math.round(Double.parseDouble((String) object));
             }
-        if (object instanceof Number)
-            return((Number) object).longValue();
+        if (object instanceof Number num)
+            return num.longValue();
         return 0;
     }
 
     /* testing */ LocalDate extractDate(Object object, Optional<String> dateFormat)
     {
-        if(dateFormat.isPresent())
+        if (dateFormat.isPresent())
         {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern(dateFormat.get());
             return LocalDate.parse(object.toString(), formatter);
         }
-        if (object instanceof String)
-            return YahooHelper.fromISODate((String) object);
-        else if (object instanceof Long)
-            return parseDateTimestamp((Long) object);
-        else if (object instanceof Integer)
-            return parseDateTimestamp(Long.valueOf((Integer) object));
-        else if (object instanceof Double)
-            return parseDateTimestamp(((Double) object).longValue());
-        else if (object instanceof LocalDate)
-            return ((LocalDate) object);
+        if (object instanceof String s)
+            return YahooHelper.fromISODate(s);
+        else if (object instanceof Long l)
+            return parseDateTimestamp(l);
+        else if (object instanceof Integer i)
+            return parseDateTimestamp(Long.valueOf(i));
+        else if (object instanceof Double d)
+            return parseDateTimestamp(d.longValue());
+        else if (object instanceof LocalDate date)
+            return date;
         return null;
     }
 
@@ -360,8 +377,10 @@ public class GenericJSONQuoteFeed implements QuoteFeed
             // 23:20:06 can't be parsed by this method
             object = object * 24 * 60 * 60;
         }
-        // The following does NOT do a time zone conversion. If the API gives epochs as dates,
-        // we always convert them to dates with respect to UTC (independent of the user timezone).
+        // The following does NOT do a time zone conversion. If the API gives
+        // epochs as dates,
+        // we always convert them to dates with respect to UTC (independent of
+        // the user timezone).
         return LocalDateTime.ofEpochSecond(object, 0, ZoneOffset.UTC).toLocalDate();
     }
 }
