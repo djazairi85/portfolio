@@ -1,5 +1,26 @@
 package name.abuchen.portfolio.datatransfer.pdf.tigerbrokerspteltd;
 
+import static name.abuchen.portfolio.datatransfer.ExtractorMatchers.dividend;
+import static name.abuchen.portfolio.datatransfer.ExtractorMatchers.hasAmount;
+import static name.abuchen.portfolio.datatransfer.ExtractorMatchers.hasCurrencyCode;
+import static name.abuchen.portfolio.datatransfer.ExtractorMatchers.hasDate;
+import static name.abuchen.portfolio.datatransfer.ExtractorMatchers.hasFees;
+import static name.abuchen.portfolio.datatransfer.ExtractorMatchers.hasGrossValue;
+import static name.abuchen.portfolio.datatransfer.ExtractorMatchers.hasIsin;
+import static name.abuchen.portfolio.datatransfer.ExtractorMatchers.hasName;
+import static name.abuchen.portfolio.datatransfer.ExtractorMatchers.hasNote;
+import static name.abuchen.portfolio.datatransfer.ExtractorMatchers.hasShares;
+import static name.abuchen.portfolio.datatransfer.ExtractorMatchers.hasSource;
+import static name.abuchen.portfolio.datatransfer.ExtractorMatchers.hasTaxes;
+import static name.abuchen.portfolio.datatransfer.ExtractorMatchers.hasTicker;
+import static name.abuchen.portfolio.datatransfer.ExtractorMatchers.hasWkn;
+import static name.abuchen.portfolio.datatransfer.ExtractorMatchers.purchase;
+import static name.abuchen.portfolio.datatransfer.ExtractorMatchers.security;
+import static name.abuchen.portfolio.datatransfer.ExtractorMatchers.taxRefund;
+import static name.abuchen.portfolio.datatransfer.ExtractorTestUtilities.countAccountTransactions;
+import static name.abuchen.portfolio.datatransfer.ExtractorTestUtilities.countBuySell;
+import static name.abuchen.portfolio.datatransfer.ExtractorTestUtilities.countSecurities;
+import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
@@ -84,9 +105,9 @@ public class TigerBrokersPteLtdPDFExtractorTest
         assertNull(entry.getNote());
 
         assertThat(entry.getPortfolioTransaction().getMonetaryAmount(),
-                        is(Money.of(CurrencyUnit.USD, Values.Amount.factorize(16070.40))));
+                        is(Money.of(CurrencyUnit.USD, Values.Amount.factorize(16072.54))));
         assertThat(entry.getPortfolioTransaction().getGrossValue(),
-                        is(Money.of(CurrencyUnit.USD, Values.Amount.factorize(16068.12))));
+                        is(Money.of(CurrencyUnit.USD, Values.Amount.factorize(16070.26))));
         assertThat(entry.getPortfolioTransaction().getUnitSum(Unit.Type.TAX),
                         is(Money.of(CurrencyUnit.USD, Values.Amount.factorize(0.00))));
         assertThat(entry.getPortfolioTransaction().getUnitSum(Unit.Type.FEE),
@@ -105,9 +126,9 @@ public class TigerBrokersPteLtdPDFExtractorTest
         assertNull(entry.getNote());
 
         assertThat(entry.getPortfolioTransaction().getMonetaryAmount(),
-                        is(Money.of(CurrencyUnit.USD, Values.Amount.factorize(1302.00))));
+                        is(Money.of(CurrencyUnit.USD, Values.Amount.factorize(1304.13))));
         assertThat(entry.getPortfolioTransaction().getGrossValue(),
-                        is(Money.of(CurrencyUnit.USD, Values.Amount.factorize(1299.86))));
+                        is(Money.of(CurrencyUnit.USD, Values.Amount.factorize(1301.99))));
         assertThat(entry.getPortfolioTransaction().getUnitSum(Unit.Type.TAX),
                         is(Money.of(CurrencyUnit.USD, Values.Amount.factorize(0.00))));
         assertThat(entry.getPortfolioTransaction().getUnitSum(Unit.Type.FEE),
@@ -126,9 +147,9 @@ public class TigerBrokersPteLtdPDFExtractorTest
         assertNull(entry.getNote());
 
         assertThat(entry.getPortfolioTransaction().getMonetaryAmount(),
-                        is(Money.of(CurrencyUnit.USD, Values.Amount.factorize(7063.20))));
+                        is(Money.of(CurrencyUnit.USD, Values.Amount.factorize(7065.33))));
         assertThat(entry.getPortfolioTransaction().getGrossValue(),
-                        is(Money.of(CurrencyUnit.USD, Values.Amount.factorize(7061.02))));
+                        is(Money.of(CurrencyUnit.USD, Values.Amount.factorize(7063.15))));
         assertThat(entry.getPortfolioTransaction().getUnitSum(Unit.Type.TAX),
                         is(Money.of(CurrencyUnit.USD, Values.Amount.factorize(0.00))));
         assertThat(entry.getPortfolioTransaction().getUnitSum(Unit.Type.FEE),
@@ -147,9 +168,9 @@ public class TigerBrokersPteLtdPDFExtractorTest
         assertNull(entry.getNote());
 
         assertThat(entry.getPortfolioTransaction().getMonetaryAmount(),
-                        is(Money.of(CurrencyUnit.USD, Values.Amount.factorize(2719.50))));
+                        is(Money.of(CurrencyUnit.USD, Values.Amount.factorize(2721.63))));
         assertThat(entry.getPortfolioTransaction().getGrossValue(),
-                        is(Money.of(CurrencyUnit.USD, Values.Amount.factorize(2717.35))));
+                        is(Money.of(CurrencyUnit.USD, Values.Amount.factorize(2719.48))));
         assertThat(entry.getPortfolioTransaction().getUnitSum(Unit.Type.TAX),
                         is(Money.of(CurrencyUnit.USD, Values.Amount.factorize(0.00))));
         assertThat(entry.getPortfolioTransaction().getUnitSum(Unit.Type.FEE),
@@ -168,9 +189,9 @@ public class TigerBrokersPteLtdPDFExtractorTest
         assertNull(entry.getNote());
 
         assertThat(entry.getPortfolioTransaction().getMonetaryAmount(),
-                        is(Money.of(CurrencyUnit.USD, Values.Amount.factorize(6679.20))));
+                        is(Money.of(CurrencyUnit.USD, Values.Amount.factorize(6681.34))));
         assertThat(entry.getPortfolioTransaction().getGrossValue(),
-                        is(Money.of(CurrencyUnit.USD, Values.Amount.factorize(6676.85))));
+                        is(Money.of(CurrencyUnit.USD, Values.Amount.factorize(6678.99))));
         assertThat(entry.getPortfolioTransaction().getUnitSum(Unit.Type.TAX),
                         is(Money.of(CurrencyUnit.USD, Values.Amount.factorize(0.00))));
         assertThat(entry.getPortfolioTransaction().getUnitSum(Unit.Type.FEE),
@@ -183,7 +204,7 @@ public class TigerBrokersPteLtdPDFExtractorTest
         assertThat(transaction.getType(), is(AccountTransaction.Type.DIVIDENDS));
 
         assertThat(transaction.getDateTime(), is(LocalDateTime.parse("2022-03-24T00:00")));
-        assertThat(transaction.getShares(), is(Values.Share.factorize(69)));
+        assertThat(transaction.getShares(), is(Values.Share.factorize(68)));
         assertThat(transaction.getSource(), is("AccountStatement01.txt"));
         assertThat(transaction.getNote(), is("Ordinary Dividend"));
 
@@ -375,9 +396,9 @@ public class TigerBrokersPteLtdPDFExtractorTest
         assertNull(entry.getNote());
 
         assertThat(entry.getPortfolioTransaction().getMonetaryAmount(),
-                        is(Money.of(CurrencyUnit.USD, Values.Amount.factorize(262.79))));
+                        is(Money.of(CurrencyUnit.USD, Values.Amount.factorize(264.94))));
         assertThat(entry.getPortfolioTransaction().getGrossValue(),
-                        is(Money.of(CurrencyUnit.USD, Values.Amount.factorize(260.64))));
+                        is(Money.of(CurrencyUnit.USD, Values.Amount.factorize(262.79))));
         assertThat(entry.getPortfolioTransaction().getUnitSum(Unit.Type.TAX),
                         is(Money.of(CurrencyUnit.USD, Values.Amount.factorize(0.00))));
         assertThat(entry.getPortfolioTransaction().getUnitSum(Unit.Type.FEE),
@@ -394,6 +415,9 @@ public class TigerBrokersPteLtdPDFExtractorTest
         List<Item> results = extractor.extract(PDFInputFile.loadTestCase(getClass(), "AccountStatement04.txt"), errors);
 
         assertThat(errors, empty());
+        assertThat(countSecurities(results), is(3L));
+        assertThat(countBuySell(results), is(5L));
+        assertThat(countAccountTransactions(results), is(2L));
         assertThat(results.size(), is(10));
         new AssertImportActions().check(results, CurrencyUnit.USD);
 
@@ -429,7 +453,7 @@ public class TigerBrokersPteLtdPDFExtractorTest
         assertThat(transaction.getType(), is(AccountTransaction.Type.DIVIDENDS));
 
         assertThat(transaction.getDateTime(), is(LocalDateTime.parse("2022-03-24T00:00")));
-        assertThat(transaction.getShares(), is(Values.Share.factorize(69)));
+        assertThat(transaction.getShares(), is(Values.Share.factorize(68)));
         assertThat(transaction.getSource(), is("AccountStatement04.txt"));
         assertThat(transaction.getNote(), is("Ordinary Dividend"));
 
@@ -475,9 +499,9 @@ public class TigerBrokersPteLtdPDFExtractorTest
         assertNull(entry.getNote());
 
         assertThat(entry.getPortfolioTransaction().getMonetaryAmount(),
-                        is(Money.of(CurrencyUnit.USD, Values.Amount.factorize(16070.40))));
+                        is(Money.of(CurrencyUnit.USD, Values.Amount.factorize(16072.54))));
         assertThat(entry.getPortfolioTransaction().getGrossValue(),
-                        is(Money.of(CurrencyUnit.USD, Values.Amount.factorize(16068.12))));
+                        is(Money.of(CurrencyUnit.USD, Values.Amount.factorize(16070.26))));
         assertThat(entry.getPortfolioTransaction().getUnitSum(Unit.Type.TAX),
                         is(Money.of(CurrencyUnit.USD, Values.Amount.factorize(0.00))));
         assertThat(entry.getPortfolioTransaction().getUnitSum(Unit.Type.FEE),
@@ -496,9 +520,9 @@ public class TigerBrokersPteLtdPDFExtractorTest
         assertNull(entry.getNote());
 
         assertThat(entry.getPortfolioTransaction().getMonetaryAmount(),
-                        is(Money.of(CurrencyUnit.USD, Values.Amount.factorize(1302.00))));
+                        is(Money.of(CurrencyUnit.USD, Values.Amount.factorize(1304.13))));
         assertThat(entry.getPortfolioTransaction().getGrossValue(),
-                        is(Money.of(CurrencyUnit.USD, Values.Amount.factorize(1299.86))));
+                        is(Money.of(CurrencyUnit.USD, Values.Amount.factorize(1301.99))));
         assertThat(entry.getPortfolioTransaction().getUnitSum(Unit.Type.TAX),
                         is(Money.of(CurrencyUnit.USD, Values.Amount.factorize(0.00))));
         assertThat(entry.getPortfolioTransaction().getUnitSum(Unit.Type.FEE),
@@ -517,9 +541,9 @@ public class TigerBrokersPteLtdPDFExtractorTest
         assertNull(entry.getNote());
 
         assertThat(entry.getPortfolioTransaction().getMonetaryAmount(),
-                        is(Money.of(CurrencyUnit.USD, Values.Amount.factorize(7063.20))));
+                        is(Money.of(CurrencyUnit.USD, Values.Amount.factorize(7065.33))));
         assertThat(entry.getPortfolioTransaction().getGrossValue(),
-                        is(Money.of(CurrencyUnit.USD, Values.Amount.factorize(7061.02))));
+                        is(Money.of(CurrencyUnit.USD, Values.Amount.factorize(7063.15))));
         assertThat(entry.getPortfolioTransaction().getUnitSum(Unit.Type.TAX),
                         is(Money.of(CurrencyUnit.USD, Values.Amount.factorize(0.00))));
         assertThat(entry.getPortfolioTransaction().getUnitSum(Unit.Type.FEE),
@@ -538,9 +562,9 @@ public class TigerBrokersPteLtdPDFExtractorTest
         assertNull(entry.getNote());
 
         assertThat(entry.getPortfolioTransaction().getMonetaryAmount(),
-                        is(Money.of(CurrencyUnit.USD, Values.Amount.factorize(2719.50))));
+                        is(Money.of(CurrencyUnit.USD, Values.Amount.factorize(2721.63))));
         assertThat(entry.getPortfolioTransaction().getGrossValue(),
-                        is(Money.of(CurrencyUnit.USD, Values.Amount.factorize(2717.35))));
+                        is(Money.of(CurrencyUnit.USD, Values.Amount.factorize(2719.48))));
         assertThat(entry.getPortfolioTransaction().getUnitSum(Unit.Type.TAX),
                         is(Money.of(CurrencyUnit.USD, Values.Amount.factorize(0.00))));
         assertThat(entry.getPortfolioTransaction().getUnitSum(Unit.Type.FEE),
@@ -559,12 +583,175 @@ public class TigerBrokersPteLtdPDFExtractorTest
         assertNull(entry.getNote());
 
         assertThat(entry.getPortfolioTransaction().getMonetaryAmount(),
-                        is(Money.of(CurrencyUnit.USD, Values.Amount.factorize(6679.20))));
+                        is(Money.of(CurrencyUnit.USD, Values.Amount.factorize(6681.34))));
         assertThat(entry.getPortfolioTransaction().getGrossValue(),
-                        is(Money.of(CurrencyUnit.USD, Values.Amount.factorize(6676.85))));
+                        is(Money.of(CurrencyUnit.USD, Values.Amount.factorize(6678.99))));
         assertThat(entry.getPortfolioTransaction().getUnitSum(Unit.Type.TAX),
                         is(Money.of(CurrencyUnit.USD, Values.Amount.factorize(0.00))));
         assertThat(entry.getPortfolioTransaction().getUnitSum(Unit.Type.FEE),
                         is(Money.of(CurrencyUnit.USD, Values.Amount.factorize(0.21 + 0.99 + 1.00 + 0.15))));
+    }
+
+    @Test
+    public void testAccountStatement05()
+    {
+        TigerBrokersPteLtdPDFExtractor extractor = new TigerBrokersPteLtdPDFExtractor(new Client());
+
+        List<Exception> errors = new ArrayList<>();
+
+        List<Item> results = extractor.extract(PDFInputFile.loadTestCase(getClass(), "AccountStatement05.txt"), errors);
+
+        assertThat(errors, empty());
+        assertThat(countSecurities(results), is(3L));
+        assertThat(countBuySell(results), is(1L));
+        assertThat(countAccountTransactions(results), is(11L));
+        assertThat(results.size(), is(15));
+        new AssertImportActions().check(results, CurrencyUnit.USD);
+
+        // check security
+        assertThat(results, hasItem(security( //
+                        hasIsin(null), hasWkn(null), hasTicker("VOO"), //
+                        hasName("Vanguard S&P 500 ETF"), //
+                        hasCurrencyCode("USD"))));
+
+        assertThat(results, hasItem(security( //
+                        hasIsin(null), hasWkn(null), hasTicker("QQQ"), //
+                        hasName("Invesco QQQ Trust"), //
+                        hasCurrencyCode("USD"))));
+
+        assertThat(results, hasItem(security( //
+                        hasIsin(null), hasWkn(null), hasTicker("VT"), //
+                        hasName("VANGUARD INTL EQUITY INDEX FUND INC TOTAL WORLD STK INDEX FUND ETF SHS"), //
+                        hasCurrencyCode("USD"))));
+
+        // check buy sell transaction
+        assertThat(results, hasItem(purchase( //
+                        hasDate("2023-01-06T03:33:08"), hasShares(1), //
+                        hasSource("AccountStatement05.txt"), hasNote(null), //
+                        hasAmount("USD", 264.94), hasGrossValue("USD", 262.79), //
+                        hasTaxes("USD", 0.00), hasFees("USD", 0.99 + 0.16 + 1.00))));
+
+        // check dividend transaction
+        assertThat(results, hasItem(dividend( //
+                        hasDate("2022-10-06T00:00"), hasShares(25), //
+                        hasSource("AccountStatement05.txt"), hasNote("Ordinary Dividend"), //
+                        hasAmount("USD", 25.71), hasGrossValue("USD", 36.73), //
+                        hasTaxes("USD", 11.02), hasFees("USD", 0.00))));
+
+        // check dividend transaction
+        assertThat(results, hasItem(dividend( //
+                        hasDate("2022-11-01T00:00"), hasShares(52), //
+                        hasSource("AccountStatement05.txt"), hasNote("Ordinary Dividend"), //
+                        hasAmount("USD", 18.88), hasGrossValue("USD", 26.97), //
+                        hasTaxes("USD", 8.09), hasFees("USD", 0.00))));
+
+        // check dividend transaction
+        assertThat(results, hasItem(dividend( //
+                        hasDate("2022-12-22T00:00"), hasShares(69), //
+                        hasSource("AccountStatement05.txt"), hasNote("Ordinary Dividend"), //
+                        hasAmount("USD", 30.82), hasGrossValue("USD", 44.03), //
+                        hasTaxes("USD", 13.21), hasFees("USD", 0.00))));
+
+        // check dividend transaction
+        assertThat(results, hasItem(dividend( //
+                        hasDate("2022-12-26T00:00"), hasShares(25), //
+                        hasSource("AccountStatement05.txt"), hasNote("Ordinary Dividend"), //
+                        hasAmount("USD", 29.25), hasGrossValue("USD", 41.79), //
+                        hasTaxes("USD", 12.54), hasFees("USD", 0.00))));
+
+        // check dividend transaction
+        assertThat(results, hasItem(dividend( //
+                        hasDate("2022-12-30T00:00"), hasShares(52), //
+                        hasSource("AccountStatement05.txt"), hasNote("Ordinary Dividend"), //
+                        hasAmount("USD", 23.86), hasGrossValue("USD", 34.08), //
+                        hasTaxes("USD", 10.22), hasFees("USD", 0.00))));
+
+        // check dividend transaction
+        assertThat(results, hasItem(dividend( //
+                        hasDate("2023-03-23T00:00"), hasShares(68), //
+                        hasSource("AccountStatement05.txt"), hasNote("Ordinary Dividend"), //
+                        hasAmount("USD", 13.78), hasGrossValue("USD", 19.68), //
+                        hasTaxes("USD", 5.90), hasFees("USD", 0.00))));
+
+        // check dividend transaction
+        assertThat(results, hasItem(dividend( //
+                        hasDate("2023-03-30T00:00"), hasShares(25), //
+                        hasSource("AccountStatement05.txt"), hasNote("Ordinary Dividend"), //
+                        hasAmount("USD", 26.02), hasGrossValue("USD", 37.18), //
+                        hasTaxes("USD", 11.16), hasFees("USD", 0.00))));
+
+        // check dividend transaction
+        assertThat(results, hasItem(dividend( //
+                        hasDate("2023-05-02T00:00"), hasShares(53), //
+                        hasSource("AccountStatement05.txt"), hasNote("Ordinary Dividend"), //
+                        hasAmount("USD", 17.52), hasGrossValue("USD", 25.03), //
+                        hasTaxes("USD", 7.51), hasFees("USD", 0.00))));
+
+        // check dividend transaction
+        assertThat(results, hasItem(dividend( //
+                        hasDate("2023-06-23T00:00"), hasShares(69), //
+                        hasSource("AccountStatement05.txt"), hasNote("Ordinary Dividend"), //
+                        hasAmount("USD", 38.15), hasGrossValue("USD", 44.88), //
+                        hasTaxes("USD", 6.73), hasFees("USD", 0.00))));
+
+        // check dividend transaction
+        assertThat(results, hasItem(dividend( //
+                        hasDate("2023-07-05T00:00"), hasShares(25), //
+                        hasSource("AccountStatement05.txt"), hasNote("Ordinary Dividend"), //
+                        hasAmount("USD", 33.49), hasGrossValue("USD", 39.40), //
+                        hasTaxes("USD", 5.91), hasFees("USD", 0.00))));
+
+        // check dividend transaction
+        assertThat(results, hasItem(dividend( //
+                        hasDate("2023-08-01T00:00"), hasShares(53), //
+                        hasSource("AccountStatement05.txt"), hasNote("Ordinary Dividend"), //
+                        hasAmount("USD", 22.70), hasGrossValue("USD", 26.71), //
+                        hasTaxes("USD", 4.01), hasFees("USD", 0.00))));
+    }
+
+    @Test
+    public void testAccountStatement06()
+    {
+        TigerBrokersPteLtdPDFExtractor extractor = new TigerBrokersPteLtdPDFExtractor(new Client());
+
+        List<Exception> errors = new ArrayList<>();
+
+        List<Item> results = extractor.extract(PDFInputFile.loadTestCase(getClass(), "AccountStatement06.txt"), errors);
+
+        assertThat(errors, empty());
+        assertThat(countSecurities(results), is(2L));
+        assertThat(countBuySell(results), is(0L));
+        assertThat(countAccountTransactions(results), is(3L));
+        assertThat(results.size(), is(5));
+        new AssertImportActions().check(results, CurrencyUnit.USD);
+
+        // check security
+        assertThat(results, hasItem(security( //
+                        hasIsin(null), hasWkn(null), hasTicker("VT"), //
+                        hasName("VANGUARD INTL EQUITY INDEX FUND INC TOTAL WORLD STK INDEX FUND ETF SHS"), //
+                        hasCurrencyCode("USD"))));
+
+        assertThat(results, hasItem(security( //
+                        hasIsin(null), hasWkn(null), hasTicker("VOO"), //
+                        hasName("Vanguard S&P 500 ETF"), //
+                        hasCurrencyCode("USD"))));
+
+        // check dividend transaction
+        assertThat(results, hasItem(dividend( //
+                        hasDate("2023-09-21T00:00"), hasShares(68), //
+                        hasSource("AccountStatement06.txt"), hasNote("Ordinary Dividend"), //
+                        hasAmount("USD", 23.78), hasGrossValue("USD", 27.98), //
+                        hasTaxes("USD", 4.20), hasFees("USD", 0.00))));
+
+        // check dividend transaction
+        assertThat(results, hasItem(dividend( //
+                        hasDate("2023-10-04T00:00"), hasShares(25), //
+                        hasSource("AccountStatement06.txt"), hasNote("Ordinary Dividend"), //
+                        hasAmount("USD", 31.71), hasGrossValue("USD", 37.31), //
+                        hasTaxes("USD", 5.60), hasFees("USD", 0.00))));
+
+        // check tax refund transaction
+        assertThat(results, hasItem(taxRefund(hasDate("2023-09-21"), hasAmount("USD", 12.29), //
+                        hasSource("AccountStatement06.txt"), hasNote(null))));
     }
 }

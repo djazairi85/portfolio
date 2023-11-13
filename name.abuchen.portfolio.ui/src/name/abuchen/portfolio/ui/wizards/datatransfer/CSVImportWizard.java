@@ -1,12 +1,16 @@
 package name.abuchen.portfolio.ui.wizards.datatransfer;
 
 import java.io.File;
+import java.nio.charset.Charset;
+import java.nio.charset.IllegalCharsetNameException;
+import java.nio.charset.UnsupportedCharsetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Inject;
 
+import org.eclipse.e4.ui.services.IStylingEngine;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.swt.graphics.Image;
@@ -14,7 +18,6 @@ import org.eclipse.swt.graphics.Image;
 import name.abuchen.portfolio.datatransfer.Extractor;
 import name.abuchen.portfolio.datatransfer.Extractor.Item;
 import name.abuchen.portfolio.datatransfer.SecurityCache;
-import name.abuchen.portfolio.datatransfer.actions.InsertAction;
 import name.abuchen.portfolio.datatransfer.csv.CSVConfig;
 import name.abuchen.portfolio.datatransfer.csv.CSVConfigManager;
 import name.abuchen.portfolio.datatransfer.csv.CSVImporter;
@@ -25,7 +28,6 @@ import name.abuchen.portfolio.model.Security;
 import name.abuchen.portfolio.model.SecurityPrice;
 import name.abuchen.portfolio.ui.Images;
 import name.abuchen.portfolio.ui.Messages;
-import name.abuchen.portfolio.ui.jobs.ConsistencyChecksJob;
 import name.abuchen.portfolio.ui.wizards.AbstractWizardPage;
 
 public class CSVImportWizard extends Wizard
@@ -65,6 +67,9 @@ public class CSVImportWizard extends Wizard
     private CSVImporter importer;
 
     @Inject
+    private IStylingEngine stylingEngine;
+
+    @Inject
     private CSVConfigManager configManager;
 
     /**
@@ -100,7 +105,35 @@ public class CSVImportWizard extends Wizard
         this.client = client;
         this.preferences = preferences;
         this.importer = new CSVImporter(client, inputFile);
+
+        setupEncoding();
+
         setWindowTitle(Messages.CSVImportWizardTitle);
+    }
+
+    private void setupEncoding()
+    {
+        // It is impossible to guess the encoding of the text file. But more
+        // often than not, it is the same as last time. Therefore we remember
+        // the last encoding used and preset it the next time.
+
+        String prefKey = CSVImportWizard.class.getName() + "-encoding"; //$NON-NLS-1$
+        String encoding = preferences.getString(prefKey);
+
+        if (encoding != null)
+        {
+            try
+            {
+                importer.setEncoding(Charset.forName(encoding));
+            }
+            catch (IllegalCharsetNameException | UnsupportedCharsetException e)
+            {
+                // ignore faulty charsets from preferences
+            }
+        }
+
+        importer.addPropertyChangeListener("encoding", //$NON-NLS-1$
+                        e -> preferences.putValue(prefKey, importer.getEncoding().name()));
     }
 
     public void setTarget(Account target)
@@ -137,7 +170,7 @@ public class CSVImportWizard extends Wizard
     @Override
     public void addPages()
     {
-        definitionPage = new CSVImportDefinitionPage(client, importer, configManager, target != null);
+        definitionPage = new CSVImportDefinitionPage(client, importer, configManager, stylingEngine, target != null);
         if (initialConfig != null)
             definitionPage.setInitialConfiguration(initialConfig);
         addPage(definitionPage);
@@ -168,17 +201,15 @@ public class CSVImportWizard extends Wizard
     {
         ((AbstractWizardPage) getContainer().getCurrentPage()).afterPage();
 
-        boolean isDirty = false;
-
         if (importer.getExtractor() == importer.getSecurityPriceExtractor())
-            isDirty = importSecurityPrices();
-        else
-            isDirty = importItems();
-
-        if (isDirty)
         {
-            client.markDirty();
-            new ConsistencyChecksJob(client, false).schedule();
+            var isDirty = importSecurityPrices();
+            if (isDirty)
+                client.markDirty();
+        }
+        else
+        {
+            new ImportController(client).perform(List.of(reviewPage));
         }
 
         return true;
@@ -202,24 +233,4 @@ public class CSVImportWizard extends Wizard
         }
         return isDirty;
     }
-
-    private boolean importItems()
-    {
-        InsertAction action = new InsertAction(client);
-        action.setConvertBuySellToDelivery(reviewPage.doConvertToDelivery());
-        action.setRemoveDividends(reviewPage.doRemoveDividends());
-
-        boolean isDirty = false;
-        for (ExtractedEntry entry : reviewPage.getEntries())
-        {
-            if (entry.isImported())
-            {
-                entry.getItem().apply(action, reviewPage);
-                isDirty = true;
-            }
-        }
-
-        return isDirty;
-    }
-
 }

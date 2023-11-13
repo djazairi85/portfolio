@@ -3,7 +3,6 @@ package name.abuchen.portfolio.ui.editor;
 import java.io.File;
 import java.io.IOException;
 import java.text.MessageFormat;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -57,8 +56,6 @@ import name.abuchen.portfolio.ui.Messages;
 import name.abuchen.portfolio.ui.PortfolioPlugin;
 import name.abuchen.portfolio.ui.UIConstants;
 import name.abuchen.portfolio.ui.editor.Navigation.Item;
-import name.abuchen.portfolio.ui.survey.Survey;
-import name.abuchen.portfolio.ui.survey.SurveyReminder;
 import name.abuchen.portfolio.ui.util.Colors;
 import name.abuchen.portfolio.ui.util.SimpleAction;
 import name.abuchen.portfolio.ui.util.swt.SashLayout;
@@ -292,17 +289,6 @@ public class PortfolioPart implements ClientInputListener
         data.right = new FormAttachment(100, -10);
         label.setLayoutData(data);
 
-        if (Survey.isActive())
-        {
-            Composite reminder = new SurveyReminder(container);
-            
-            data = new FormData();
-            data.top = new FormAttachment(0, 10);
-            data.right = new FormAttachment(100, -10);
-            data.width = 300;
-            reminder.setLayoutData(data);
-        }
-        
         return bar;
     }
 
@@ -468,7 +454,7 @@ public class PortfolioPart implements ClientInputListener
         return clientInput.getEclipsePreferences();
     }
 
-    public List<ReportingPeriod> getReportingPeriods()
+    public ReportingPeriods getReportingPeriods()
     {
         return clientInput.getReportingPeriods();
     }
@@ -501,8 +487,8 @@ public class PortfolioPart implements ClientInputListener
 
         if (selectedPeriod == null)
         {
-            List<ReportingPeriod> periods = clientInput.getReportingPeriods();
-            selectedPeriod = periods.isEmpty() ? new ReportingPeriod.LastX(1, 0) : periods.get(0);
+            selectedPeriod = clientInput.getReportingPeriods().stream().findFirst()
+                            .orElseGet(() -> new ReportingPeriod.LastX(1, 0));
         }
 
         return selectedPeriod;

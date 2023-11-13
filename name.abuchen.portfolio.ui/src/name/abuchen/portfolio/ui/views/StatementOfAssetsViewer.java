@@ -1,5 +1,7 @@
 package name.abuchen.portfolio.ui.views;
 
+import static name.abuchen.portfolio.util.CollectorsUtil.toMutableList;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -93,6 +95,7 @@ import name.abuchen.portfolio.ui.util.LabelOnly;
 import name.abuchen.portfolio.ui.util.SimpleAction;
 import name.abuchen.portfolio.ui.util.viewers.Column;
 import name.abuchen.portfolio.ui.util.viewers.ColumnEditingSupport;
+import name.abuchen.portfolio.ui.util.viewers.ColumnEditingSupport.MarkDirtyClientListener;
 import name.abuchen.portfolio.ui.util.viewers.ColumnEditingSupport.TouchClientListener;
 import name.abuchen.portfolio.ui.util.viewers.ColumnViewerSorter;
 import name.abuchen.portfolio.ui.util.viewers.CopyPasteSupport;
@@ -570,7 +573,7 @@ public class StatementOfAssetsViewer
 
         // create a modifiable copy as all menus share the same list of
         // reporting periods
-        List<ReportingPeriod> options = new ArrayList<>(owner.getPart().getReportingPeriods());
+        List<ReportingPeriod> options = owner.getPart().getReportingPeriods().stream().collect(toMutableList());
 
         addPerformanceColumns(options);
         addDividendColumns(options);
@@ -603,7 +606,7 @@ public class StatementOfAssetsViewer
         stylingEngine.style(assets.getTable());
 
         LocalResourceManager resources = new LocalResourceManager(JFaceResources.getResources(), assets.getTable());
-        boldFont = resources.createFont(FontDescriptor.createFrom(assets.getTable().getFont()).setStyle(SWT.BOLD));
+        boldFont = resources.create(FontDescriptor.createFrom(assets.getTable().getFont()).setStyle(SWT.BOLD));
 
         return container;
     }
@@ -754,7 +757,7 @@ public class StatementOfAssetsViewer
                         .forEach(column -> {
                             if (column.getSorter() != null)
                                 column.getSorter().wrap(ElementComparator::new);
-                            column.getEditingSupport().addListener(new TouchClientListener(client));
+                            column.getEditingSupport().addListener(new MarkDirtyClientListener(client));
                             support.addColumn(column);
                         });
     }

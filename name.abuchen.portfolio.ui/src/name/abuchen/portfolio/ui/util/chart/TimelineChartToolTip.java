@@ -87,6 +87,11 @@ public class TimelineChartToolTip extends AbstractChartToolTip
         this.defaultValueFormat = defaultValueFormat;
     }
 
+    public Format getDefaultValueFormat()
+    {
+        return this.defaultValueFormat;
+    }
+
     public void overrideValueFormat(String series, Format valueFormat)
     {
         this.overrideValueFormat.put(series, valueFormat);
@@ -116,7 +121,7 @@ public class TimelineChartToolTip extends AbstractChartToolTip
     }
 
     @Override
-    protected Object getFocusObjectAt(Event event)
+    protected final Object getFocusObjectAt(Event event)
     {
         return categoryEnabled ? getFocusCategoryAt(event) : getFocusDateAt(event);
     }
@@ -227,8 +232,8 @@ public class TimelineChartToolTip extends AbstractChartToolTip
 
         Label hint = new Label(data, SWT.NONE);
         hint.setText(Messages.TooltipHintPressAlt);
-        hint.setFont(this.resourceManager.createFont(
-                        FontDescriptor.createFrom(data.getFont()).increaseHeight(-3).withStyle(SWT.ITALIC)));
+        hint.setFont(this.resourceManager
+                        .create(FontDescriptor.createFrom(data.getFont()).increaseHeight(-3).withStyle(SWT.ITALIC)));
         GridDataFactory.fillDefaults().span(2, 1).applyTo(hint);
     }
 

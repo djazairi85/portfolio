@@ -18,8 +18,8 @@ public class BondoraCapitalPDFExtractor extends AbstractPDFExtractor
     {
         super(client);
 
-        addBankIdentifier("Zusammenfassung"); //$NON-NLS-1$
-        addBankIdentifier("Summary"); //$NON-NLS-1$
+        addBankIdentifier("Zusammenfassung");
+        addBankIdentifier("Summary");
 
         addAccountStatementTransaction();
     }
@@ -27,7 +27,7 @@ public class BondoraCapitalPDFExtractor extends AbstractPDFExtractor
     @Override
     public String getLabel()
     {
-        return "Bondora Capital"; //$NON-NLS-1$
+        return "Bondora Capital";
     }
 
     private void addAccountStatementTransaction()
@@ -35,7 +35,7 @@ public class BondoraCapitalPDFExtractor extends AbstractPDFExtractor
         final DocumentType type = new DocumentType("(Zusammenfassung|Summary)");
         this.addDocumentTyp(type);
 
-        Block block = new Block("^([\\d]{2}.[\\d]{2}.[\\d]{4}|[\\d]{4}.[\\d]{2}.[\\d]{2}) .*$");
+        Block block = new Block("^([\\d]{1,2}.[\\d]{1,2}.[\\d]{4}|[\\d]{4}.[\\d]{1,2}.[\\d]{1,2}) .*$");
         type.addBlock(block);
         block.setMaxSize(1);
 
@@ -48,7 +48,7 @@ public class BondoraCapitalPDFExtractor extends AbstractPDFExtractor
 
         pdfTransaction
                 .section("type").optional()
-                .match("^([\\d]{2}.[\\d]{2}.[\\d]{4}|[\\d]{4}.[\\d]{2}.[\\d]{2}) "
+                .match("^([\\d]{1,2}.[\\d]{1,2}.[\\d]{4}|[\\d]{4}.[\\d]{1,2}.[\\d]{1,2}) "
                                 + "(?<type>(.berweisen"
                                 + "|Transfer"
                                 + "|Abheben"
@@ -57,9 +57,9 @@ public class BondoraCapitalPDFExtractor extends AbstractPDFExtractor
                                 + "|Withdrawal)"
                                 + ") .*$")
                 .assign((t, v) -> {
-                    if (v.get("type").equals("Überweisen") || v.get("type").equals("Transfer"))
+                    if ("Überweisen".equals(v.get("type")) || "Transfer".equals(v.get("type")))
                         t.setType(AccountTransaction.Type.DEPOSIT);
-                    else if (v.get("type").equals("Abheben") || v.get("type").equals("Withdrawal"))
+                    else if ("Abheben".equals(v.get("type")) || "Withdrawal".equals(v.get("type")))
                         t.setType(AccountTransaction.Type.REMOVAL);
                 })
 
@@ -73,7 +73,7 @@ public class BondoraCapitalPDFExtractor extends AbstractPDFExtractor
                         // @formatter:on
                         section -> section
                                 .attributes("date", "note", "amount")
-                                .match("^(?<date>([\\d]{2}\\.[\\d]{2}\\.[\\d]{4}|[\\d]{4}\\.[\\d]{2}\\.[\\d]{2})) "
+                                .match("^(?<date>([\\d]{1,2}\\.[\\d]{2}\\.[\\d]{4}|[\\d]{4}\\.[\\d]{2}\\.[\\d]{2})) "
                                                 + "(?<note>(.berweisen"
                                                 + "|Transfer"
                                                 + "|Abheben"
@@ -86,17 +86,17 @@ public class BondoraCapitalPDFExtractor extends AbstractPDFExtractor
                                 .assign((t, v) -> {
                                     t.setDateTime(asDate(v.get("date")));
 
-                                    String language = "de"; //$NON-NLS-1$
-                                    String country = "DE"; //$NON-NLS-1$
+                                    String language = "de";
+                                    String country = "DE";
 
-                                    int apostrophe = v.get("amount").indexOf("\'"); //$NON-NLS-1$
+                                    int apostrophe = v.get("amount").indexOf("\'");
                                     if (apostrophe >= 0)
                                     {
-                                        language = "de"; //$NON-NLS-1$
-                                        country = "CH"; //$NON-NLS-1$
+                                        language = "de";
+                                        country = "CH";
                                     }
 
-                                    t.setAmount(asAmount(v.get("amount").trim().replaceAll("\\s", ""), language, country));
+                                    t.setAmount(asAmount(v.get("amount"), language, country));
                                     t.setCurrencyCode(asCurrencyCode(CurrencyUnit.EUR));
                                     t.setNote(trim(v.get("note")));
                                 })
@@ -106,10 +106,12 @@ public class BondoraCapitalPDFExtractor extends AbstractPDFExtractor
                         // 03/02/2023 Go & Grow Zinsen €1.62 €9,074.6
                         // 03/03/2023 Go & Grow Zinsen €1.62 €9,076.22
                         // 03/04/2023 Go & Grow Zinsen €1.63 €9,077.85
+                        // 4/1/2023 Go & Grow returns €0.84 €4,723.86
+                        // 4/6/2023 Transfer €50 €4,777.24
                         // @formatter:on
                         section -> section
                                 .attributes("date", "note", "amount")
-                                .match("^(?<date>([\\d]{2}\\/[\\d]{2}\\/[\\d]{4}|[\\d]{4}\\/[\\d]{2}\\/[\\d]{2})) "
+                                .match("^(?<date>([\\d]{1,2}\\/[\\d]{1,2}\\/[\\d]{4}|[\\d]{4}\\/[\\d]{1,2}\\/[\\d]{1,2})) "
                                                 + "(?<note>(.berweisen"
                                                 + "|Transfer"
                                                 + "|Abheben"
@@ -122,17 +124,17 @@ public class BondoraCapitalPDFExtractor extends AbstractPDFExtractor
                                 .assign((t, v) -> {
                                     t.setDateTime(asDate(v.get("date"), Locale.UK));
 
-                                    String language = "de"; //$NON-NLS-1$
-                                    String country = "DE"; //$NON-NLS-1$
+                                    String language = "de";
+                                    String country = "DE";
 
-                                    int lastDot = v.get("amount").lastIndexOf("."); //$NON-NLS-1$
-                                    int lastComma = v.get("amount").lastIndexOf(","); //$NON-NLS-1$
-    
+                                    int lastDot = v.get("amount").lastIndexOf(".");
+                                    int lastComma = v.get("amount").lastIndexOf(",");
+
                                     // returns the greater of two int values
                                     if (Math.max(lastDot, lastComma) == lastDot)
                                     {
-                                        language = "en"; //$NON-NLS-1$
-                                        country = "US"; //$NON-NLS-1$
+                                        language = "en";
+                                        country = "US";
                                     }
 
                                     t.setAmount(asAmount(v.get("amount"), language, country));
@@ -146,7 +148,7 @@ public class BondoraCapitalPDFExtractor extends AbstractPDFExtractor
                         // @formatter:on
                         section -> section
                                 .attributes("date", "note", "amount")
-                                .match("^(?<date>([\\d]{2}\\-[\\d]{2}\\-[\\d]{4}|[\\d]{4}\\-[\\d]{2}\\-[\\d]{2})) "
+                                .match("^(?<date>([\\d]{1,2}\\-[\\d]{1,2}\\-[\\d]{4}|[\\d]{4}\\-[\\d]{1,2}\\-[\\d]{1,2})) "
                                                 + "(?<note>(.berweisen"
                                                 + "|Transfer"
                                                 + "|Abheben"

@@ -122,7 +122,7 @@ public abstract class AbstractHeatmapWidget<N extends Number> extends WidgetDele
 
         model.getHeader().forEach(header -> {
             CLabel l = new CLabel(table, SWT.CENTER);
-            l.setText(header.getLabel());
+            l.setText(TextUtil.tooltip(header.getLabel()));
             l.setBackground(table.getBackground());
 
             InfoToolTip.attach(l, header.getToolTip() != null ? header.getToolTip() : header.getLabel());
@@ -173,7 +173,7 @@ public abstract class AbstractHeatmapWidget<N extends Number> extends WidgetDele
         if (showStandardDeviation)
             model.addHeader("s", HeatmapOrnament.STANDARD_DEVIATION.toString()); //$NON-NLS-1$
         if (showAverage)
-            model.addHeader("\u2300", EarningsHeatmapWidget.Average.AVERAGE.toString()); //$NON-NLS-1$
+            model.addHeader("\u2300", Average.AVERAGE.toString()); //$NON-NLS-1$
     }
 
     protected Double geometricMean(List<Double> values)

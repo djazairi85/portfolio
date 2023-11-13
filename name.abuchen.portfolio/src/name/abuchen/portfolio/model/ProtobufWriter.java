@@ -107,6 +107,10 @@ import name.abuchen.portfolio.money.Money;
         Client client = new Client();
         client.setVersion(newClient.getVersion());
 
+        String baseCurrency = newClient.getBaseCurrency();
+        if (!baseCurrency.isEmpty())
+            client.setBaseCurrency(baseCurrency);
+
         // load settings first because the recreation of attributes attached to
         // securities, accounts, portfolios, and investment plans needs the meta
         // data
@@ -705,7 +709,7 @@ import name.abuchen.portfolio.money.Money;
                 watchlist.addSecurity(security);
             }
 
-            client.getWatchlists().add(watchlist);
+            client.addWatchlist(watchlist);
         }
     }
 
@@ -760,6 +764,7 @@ import name.abuchen.portfolio.money.Money;
         PClient.Builder newClient = PClient.newBuilder();
 
         newClient.setVersion(client.getVersion());
+        newClient.setBaseCurrency(client.getBaseCurrency());
 
         saveSecurities(client, newClient);
         saveAccounts(client, newClient);
@@ -1195,9 +1200,13 @@ import name.abuchen.portfolio.money.Money;
                 {
                     PConfigurationSet.Builder newConfigurationSet = PConfigurationSet.newBuilder();
                     newConfigurationSet.setKey(entry.getKey());
-                    newConfigurationSet.setUuid(config.getUUID());
-                    newConfigurationSet.setName(config.getName());
-                    newConfigurationSet.setData(config.getData());
+                    if (config.getUUID() != null)
+                        newConfigurationSet.setUuid(config.getUUID());
+                    if (config.getName() != null)
+                        newConfigurationSet.setName(config.getName());
+                    if (config.getData() != null)
+                        newConfigurationSet.setData(config.getData());
+
                     newSettings.addConfigurationSets(newConfigurationSet);
                 }
 

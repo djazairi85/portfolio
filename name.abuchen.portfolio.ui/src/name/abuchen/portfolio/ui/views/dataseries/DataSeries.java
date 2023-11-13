@@ -56,8 +56,8 @@ public final class DataSeries implements Adaptable
         PORTFOLIO_PLUS_ACCOUNT("[+]Portfolio", i -> ((Portfolio) i).getUUID()), //$NON-NLS-1$
         PORTFOLIO_PLUS_ACCOUNT_PRETAX("[+]Portfolio-PreTax", i -> ((Portfolio) i).getUUID()), //$NON-NLS-1$
         CLASSIFICATION("Classification", i -> ((Classification) i).getId()), //$NON-NLS-1$
-        CLIENT_FILTER("ClientFilter", i -> ((ClientFilterMenu.Item) i).getUUIDs().replaceAll(",", "")), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-        CLIENT_FILTER_PRETAX("ClientFilter-PreTax", i -> ((ClientFilterMenu.Item) i).getUUIDs().replaceAll(",", "")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        CLIENT_FILTER("ClientFilter", i -> ((ClientFilterMenu.Item) i).getId()), //$NON-NLS-1$ $
+        CLIENT_FILTER_PRETAX("ClientFilter-PreTax", i -> ((ClientFilterMenu.Item) i).getId()); //$NON-NLS-1$
 
         private final String label;
         private final Function<Object, String> uuidProvider;
@@ -124,7 +124,7 @@ public final class DataSeries implements Adaptable
 
     public String getLabel()
     {
-        return isBenchmark() ? label + Messages.ChartSeriesBenchmarkSuffix : label;
+        return isBenchmark() ? label + " " + Messages.ChartSeriesBenchmarkSuffix : label; //$NON-NLS-1$
     }
 
     public void setLabel(String label)
@@ -147,7 +147,7 @@ public final class DataSeries implements Adaptable
         }
 
         if (isBenchmark())
-            buf.append(Messages.ChartSeriesBenchmarkSuffix);
+            buf.append(" ").append(Messages.ChartSeriesBenchmarkSuffix); //$NON-NLS-1$
 
         return buf.toString();
     }

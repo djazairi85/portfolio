@@ -15,6 +15,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 
 import name.abuchen.portfolio.money.CurrencyUnit;
@@ -83,6 +84,7 @@ public final class Security implements Attributable, InvestmentVehicle
     @Deprecated
     private String industryClassification;
 
+    @VisibleForTesting
     public Security()
     {
         this.uuid = UUID.randomUUID().toString();
@@ -237,10 +239,11 @@ public final class Security implements Attributable, InvestmentVehicle
      */
     public String getTickerSymbolWithoutStockMarket()
     {
-        if (tickerSymbol != null && !tickerSymbol.isEmpty() && tickerSymbol.contains(".")) //$NON-NLS-1$
-            return tickerSymbol.substring(0, tickerSymbol.indexOf('.'));
-        else
-            return tickerSymbol;
+        if (tickerSymbol == null)
+            return null;
+
+        int p = tickerSymbol.indexOf('.');
+        return p >= 0 ? tickerSymbol.substring(0, p) : tickerSymbol;
     }
 
     public String getWkn()

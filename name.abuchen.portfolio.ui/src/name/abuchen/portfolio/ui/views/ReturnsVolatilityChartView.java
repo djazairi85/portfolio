@@ -27,6 +27,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.swtchart.IAxis;
 import org.swtchart.ILineSeries;
+import org.swtchart.ILineSeries.PlotSymbolType;
 import org.swtchart.ISeries;
 
 import com.google.common.collect.Lists;
@@ -286,12 +287,16 @@ public class ReturnsVolatilityChartView extends AbstractHistoricView
             double risk = this.riskMetric.getRisk(index);
             double retrn = this.useIRR ? index.getPerformanceIRR() : index.getFinalAccumulatedPercentage();
 
+            if (Double.isInfinite(risk) || Double.isInfinite(retrn))
+                return;
+
             ILineSeries lineSeries = chart.addScatterSeries(series.getUUID(), new double[] { risk },
                             new double[] { retrn }, series.getLabel());
 
             Color color = resources.createColor(series.getColor());
             lineSeries.setLineColor(color);
             lineSeries.setSymbolColor(color);
+            lineSeries.setSymbolType(series.isBenchmark() ? PlotSymbolType.DIAMOND : PlotSymbolType.CIRCLE);
             lineSeries.enableArea(series.isShowArea());
             lineSeries.setLineStyle(series.getLineStyle());
         });

@@ -154,9 +154,12 @@ public class ListSelectionDialog extends Dialog
             input.setFocus(); // when text input visible, set focus
         }
 
-        Label label = new Label(container, SWT.NONE | SWT.WRAP);
-        label.setText(this.message);
-        GridDataFactory.fillDefaults().span(2, 1).grab(true, false).applyTo(label);
+        if (message != null && !message.isEmpty())
+        {
+            Label label = new Label(container, SWT.NONE | SWT.WRAP);
+            label.setText(this.message);
+            GridDataFactory.fillDefaults().span(2, 1).grab(true, false).applyTo(label);
+        }
 
         searchText = new Text(container, SWT.SEARCH | SWT.ICON_SEARCH | SWT.ICON_CANCEL);
         GridDataFactory.fillDefaults().span(2, 1).grab(true, false).applyTo(searchText);
@@ -172,11 +175,14 @@ public class ListSelectionDialog extends Dialog
 
         elementFilter = new ElementFilter();
 
-        int style = SWT.BORDER | SWT.FULL_SELECTION;
+        int style = SWT.BORDER | SWT.FULL_SELECTION | SWT.VIRTUAL;
         if (isMultiSelection)
             style |= SWT.MULTI;
+
         tableViewer = new TableViewer(tableArea, style);
+        tableViewer.setUseHashlookup(true);
         CopyPasteSupport.enableFor(tableViewer);
+
         final Table table = tableViewer.getTable();
         table.setHeaderVisible(false);
         table.setLinesVisible(false);

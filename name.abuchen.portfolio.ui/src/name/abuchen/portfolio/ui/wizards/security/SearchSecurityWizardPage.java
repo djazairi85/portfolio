@@ -2,6 +2,7 @@ package name.abuchen.portfolio.ui.wizards.security;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -53,6 +54,7 @@ public class SearchSecurityWizardPage extends WizardPage
         super(PAGE_ID);
         setTitle(Messages.SecurityMenuAddNewSecurity);
         setDescription(Messages.SecurityMenuAddNewSecurityDescription);
+        setPageComplete(false);
 
         this.client = client;
     }
@@ -75,6 +77,7 @@ public class SearchSecurityWizardPage extends WizardPage
 
         final Button searchButton = new Button(container, SWT.PUSH);
         searchButton.setText(Messages.LabelSearch);
+        searchButton.setEnabled(false);
 
         final TableViewer resultTable = new TableViewer(container, SWT.FULL_SELECTION);
         CopyPasteSupport.enableFor(resultTable);
@@ -86,7 +89,7 @@ public class SearchSecurityWizardPage extends WizardPage
 
         column = new TableColumn(resultTable.getTable(), SWT.NONE);
         column.setText(Messages.ColumnSymbol);
-        column.setWidth(60);
+        column.setWidth(80);
 
         column = new TableColumn(resultTable.getTable(), SWT.NONE);
         column.setText(Messages.ColumnISIN);
@@ -98,15 +101,19 @@ public class SearchSecurityWizardPage extends WizardPage
 
         column = new TableColumn(resultTable.getTable(), SWT.NONE);
         column.setText(Messages.ColumnSecurityType);
-        column.setWidth(60);
+        column.setWidth(80);
 
         column = new TableColumn(resultTable.getTable(), SWT.NONE);
         column.setText(Messages.ColumnSecurityExchange);
         column.setWidth(80);
 
         column = new TableColumn(resultTable.getTable(), SWT.NONE);
-        column.setText(Messages.ColumnSource);
+        column.setText(Messages.ColumnCurrency);
         column.setWidth(80);
+
+        column = new TableColumn(resultTable.getTable(), SWT.NONE);
+        column.setText(Messages.ColumnSource);
+        column.setWidth(120);
 
         resultTable.getTable().setHeaderVisible(true);
         resultTable.getTable().setLinesVisible(true);
@@ -128,11 +135,26 @@ public class SearchSecurityWizardPage extends WizardPage
                         (SecuritySearchProvider.Type) typeBox.getStructuredSelection().getFirstElement(), resultTable);
 
         searchBox.addSelectionListener(SelectionListener.widgetDefaultSelectedAdapter(onSearchEvent));
+        searchBox.addModifyListener(e -> {
+            if (e.widget instanceof Text txt)
+            {
+                searchButton.setEnabled(!txt.getText().isBlank());
+            }
+        });
         searchButton.addSelectionListener(SelectionListener.widgetSelectedAdapter(onSearchEvent));
 
         resultTable.addSelectionChangedListener(event -> {
+            setErrorMessage(null);
             item = (ResultItem) ((IStructuredSelection) event.getSelection()).getFirstElement();
-            setPageComplete(item != null && !existingSymbols.contains(item.getSymbol()));
+
+            boolean symbolAlreadyExist = item != null && item.getSymbol() != null && !item.getSymbol().isEmpty()
+                            && existingSymbols.contains(item.getSymbol());
+
+            setPageComplete(item != null && !symbolAlreadyExist);
+
+            if (symbolAlreadyExist)
+                setErrorMessage(MessageFormat.format(Messages.SearchSecurityWizardPageSymbolAlreadyExistsInfo,
+                                item.getSymbol()));
         });
 
         setControl(container);
@@ -147,6 +169,12 @@ public class SearchSecurityWizardPage extends WizardPage
     {
         try
         {
+            if (query.isBlank())
+                return;
+
+            // after searching, selection required to enable finish button
+            setPageComplete(false);
+
             getContainer().run(true, false, progressMonitor -> {
                 List<SecuritySearchProvider> providers = Factory.getSearchProvider();
 
@@ -175,6 +203,8 @@ public class SearchSecurityWizardPage extends WizardPage
 
                     if (!errors.isEmpty())
                         setErrorMessage(String.join(", ", errors)); //$NON-NLS-1$
+                    else
+                        setErrorMessage(null);
                 });
 
             });
@@ -230,6 +260,8 @@ public class SearchSecurityWizardPage extends WizardPage
                 case 5:
                     return item.getExchange();
                 case 6:
+                    return item.getCurrencyCode() != null ? item.getCurrencyCode() : null;
+                case 7:
                     return item.getSource();
                 default:
                     throw new IllegalArgumentException(String.valueOf(columnIndex));
@@ -241,7 +273,7 @@ public class SearchSecurityWizardPage extends WizardPage
         {
             ResultItem item = (ResultItem) element;
 
-            if (item.getSymbol() != null && symbols.contains(item.getSymbol()))
+            if (item.getSymbol() != null && !item.getSymbol().isEmpty() && symbols.contains(item.getSymbol()))
                 return Display.getCurrent().getSystemColor(SWT.COLOR_GRAY);
             else
                 return null;

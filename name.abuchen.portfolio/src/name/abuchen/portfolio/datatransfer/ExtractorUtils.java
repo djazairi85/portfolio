@@ -1,5 +1,7 @@
 package name.abuchen.portfolio.datatransfer;
 
+import static name.abuchen.portfolio.util.TextUtil.trim;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
@@ -35,22 +37,32 @@ public class ExtractorUtils
                     DateTimeFormatter.ofPattern("dd.MM.yy", Locale.GERMANY), //$NON-NLS-1$
                     DateTimeFormatter.ofPattern("dd-MM-yyyy", Locale.GERMANY), //$NON-NLS-1$
                     DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.GERMANY), //$NON-NLS-1$
+                    DateTimeFormatter.ofPattern("dd. MMMM yyyy", Locale.GERMANY), //$NON-NLS-1$
                     DateTimeFormatter.ofPattern("d. MMMM yyyy", Locale.GERMANY), //$NON-NLS-1$
+                    DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.GERMANY), //$NON-NLS-1$
+                    DateTimeFormatter.ofPattern("d MMMM yyyy", Locale.GERMANY), //$NON-NLS-1$
                     DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale.GERMANY) }; //$NON-NLS-1$
 
     private static final DateTimeFormatter[] DATE_FORMATTER_US = { //
+                    DateTimeFormatter.ofPattern("dd LLLL yyyy", Locale.US), //$NON-NLS-1$
+                    DateTimeFormatter.ofPattern("d LLLL yyyy", Locale.US), //$NON-NLS-1$
                     DateTimeFormatter.ofPattern("dd LLL yyyy", Locale.US), //$NON-NLS-1$
-                    DateTimeFormatter.ofPattern("d LLL yyyy", Locale.US) }; //$NON-NLS-1$
+                    DateTimeFormatter.ofPattern("d LLL yyyy", Locale.US), //$NON-NLS-1$
+                    DateTimeFormatter.ofPattern("yyyyMMdd", Locale.US) }; //$NON-NLS-1$
 
     private static final DateTimeFormatter[] DATE_FORMATTER_CANADA = { //
-                    DateTimeFormatter.ofPattern("dd LLL yyyy", Locale.CANADA) }; //$NON-NLS-1$
+                    DateTimeFormatter.ofPattern("LLL dd, yyyy", Locale.CANADA) }; //$NON-NLS-1$
 
     private static final DateTimeFormatter[] DATE_FORMATTER_CANADA_FRENCH = { //
                     DateTimeFormatter.ofPattern("dd LLL yyyy", Locale.CANADA_FRENCH) }; //$NON-NLS-1$
 
     private static final DateTimeFormatter[] DATE_FORMATTER_UK = { //
+                    DateTimeFormatter.ofPattern("dd LLLL yyyy", Locale.UK), //$NON-NLS-1$
+                    DateTimeFormatter.ofPattern("d LLLL yyyy", Locale.UK), //$NON-NLS-1$
                     DateTimeFormatter.ofPattern("dd LLL yyyy", Locale.UK), //$NON-NLS-1$
+                    DateTimeFormatter.ofPattern("d LLL yyyy", Locale.UK), //$NON-NLS-1$
                     DateTimeFormatter.ofPattern("LL/dd/yyyy", Locale.UK), //$NON-NLS-1$
+                    DateTimeFormatter.ofPattern("L/d/yyyy", Locale.UK), //$NON-NLS-1$
                     DateTimeFormatter.ofPattern("dd.LL.yyyy", Locale.UK) }; //$NON-NLS-1$
 
     private static final Map<Locale, DateTimeFormatter[]> LOCALE2DATE = Map.of( //
@@ -63,12 +75,18 @@ public class ExtractorUtils
     private static final DateTimeFormatter[] DATE_TIME_FORMATTER = { //
                     DateTimeFormatter.ofPattern("d.M.yyyy HH:mm", Locale.GERMANY), //$NON-NLS-1$
                     DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm", Locale.GERMANY), //$NON-NLS-1$
+                    DateTimeFormatter.ofPattern("dd LLLL yyyy HH:mm:ss", Locale.GERMANY), //$NON-NLS-1$
+                    DateTimeFormatter.ofPattern("d LLLL yyyy HH:mm:ss", Locale.GERMANY), //$NON-NLS-1$
+                    DateTimeFormatter.ofPattern("dd LLL yyyy HH:mm:ss", Locale.GERMANY), //$NON-NLS-1$
+                    DateTimeFormatter.ofPattern("d LLLL yyyy HH:mm:ss", Locale.GERMANY), //$NON-NLS-1$
                     DateTimeFormatter.ofPattern("d LLL yyyy HH:mm:ss", Locale.GERMANY), //$NON-NLS-1$
                     DateTimeFormatter.ofPattern("d. MMMM yyyy HH:mm:ss", Locale.GERMANY), //$NON-NLS-1$
                     DateTimeFormatter.ofPattern("d.M.yyyy HH:mm:ss", Locale.GERMANY), //$NON-NLS-1$
                     DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss", Locale.GERMANY), //$NON-NLS-1$
                     DateTimeFormatter.ofPattern("dd.MM.yyyy HH.mm.ss", Locale.GERMANY), //$NON-NLS-1$
+                    DateTimeFormatter.ofPattern("dd.MM.yyyy H:mm:ss", Locale.GERMANY), //$NON-NLS-1$
                     DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss", Locale.US), //$NON-NLS-1$
+                    DateTimeFormatter.ofPattern("yyyyMMdd HHmmss", Locale.US), //$NON-NLS-1$
                     DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm", Locale.UK), //$NON-NLS-1$
                     DateTimeFormatter.ofPattern("dd.MM.yyyy hh:mm:ss a", Locale.UK) }; //$NON-NLS-1$
 
@@ -166,6 +184,27 @@ public class ExtractorUtils
     {
         DecimalFormat newNumberFormat = (DecimalFormat) NumberFormat.getInstance(new Locale(language, country));
 
+        /**
+         * @formatter:off
+         * 
+         * The group separator for language format French is a space followed by the decimal separator comma.
+         * fr_FR --> 1 234,56
+         * 
+         * If the amount has the group separator space, the string can still have the following format.
+         * xh_ZA --> 1 234.56
+         * 
+         * To simplify the two variants, we remove the spaces in the string, bypassing the generation of an additional identification via the locale.
+         * 
+         * The problem is that we can only pass one main formatting per importer.
+         * e.g. 
+         * Importer: PostfinancePDFExtractor.java
+         * Test file: Kauf01.txt vs. Kauf04.txt
+         * We remove the spaces from the complete string and bypass the formatting.
+         * 
+         * @formatter:on
+         */
+        value = trim(value).replaceAll("\\s", "");
+
         if (country.equals("CH"))
         {
             /***
@@ -195,6 +234,27 @@ public class ExtractorUtils
     public static BigDecimal convertToNumberBigDecimal(String value, Values<Long> valueType, String language,
                     String country)
     {
+        /**
+         * @formatter:off
+         * 
+         * The group separator for language format French is a space followed by the decimal separator comma.
+         * fr_FR --> 1 234,56
+         * 
+         * If the amount has the group separator space, the string can still have the following format.
+         * xh_ZA --> 1 234.56
+         * 
+         * To simplify the two variants, we remove the spaces in the string, bypassing the generation of an additional identification via the locale.
+         * 
+         * The problem is that we can only pass one main formatting per importer.
+         * e.g. 
+         * Importer: PostfinancePDFExtractor.java
+         * Test file: Kauf01.txt vs. Kauf04.txt
+         * We remove the spaces from the complete string and bypass the formatting.
+         * 
+         * @formatter:on
+         */
+        value = trim(value).replaceAll("\\s", "");
+
         DecimalFormat newNumberFormat = (DecimalFormat) NumberFormat.getInstance(new Locale(language, country));
 
         if (country.equals("CH"))

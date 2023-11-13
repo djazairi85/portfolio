@@ -52,11 +52,7 @@ public interface Extractor
 
     public abstract static class Item
     {
-        /**
-         * Store arbitrary data with the extracted item. Currently to pass the
-         * JSON structure of the transaction to the test cases
-         */
-        private Object data;
+        private Map<String, Object> data = new HashMap<>();
 
         private Account accountPrimary;
 
@@ -73,6 +69,8 @@ public interface Extractor
         public abstract Annotated getSubject();
 
         public abstract Security getSecurity();
+
+        public abstract void setSecurity(Security security);
 
         public abstract String getTypeInformation();
 
@@ -108,16 +106,18 @@ public interface Extractor
             return null;
         }
 
+        public abstract void setNote(String note);
+
         public abstract Status apply(ImportAction action, Context context);
 
-        public Object getData()
+        public Object getData(String key)
         {
-            return data;
+            return this.data.get(key);
         }
 
-        public void setData(Object data)
+        public void setData(String key, Object value)
         {
-            this.data = data;
+            this.data.put(key, value);
         }
 
         public Account getAccountPrimary()
@@ -250,6 +250,18 @@ public interface Extractor
         }
 
         @Override
+        public void setSecurity(Security security)
+        {
+            transaction.setSecurity(security);
+        }
+
+        @Override
+        public void setNote(String note)
+        {
+            transaction.setNote(note);
+        }
+
+        @Override
         public String getSource()
         {
             return transaction.getSource();
@@ -325,6 +337,18 @@ public interface Extractor
         }
 
         @Override
+        public void setSecurity(Security security)
+        {
+            entry.setSecurity(security);
+        }
+
+        @Override
+        public void setNote(String note)
+        {
+            entry.setNote(note);
+        }
+
+        @Override
         public String getSource()
         {
             return entry.getAccountTransaction().getSource();
@@ -392,6 +416,18 @@ public interface Extractor
         public Security getSecurity()
         {
             return null;
+        }
+
+        @Override
+        public void setSecurity(Security security)
+        {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void setNote(String note)
+        {
+            entry.setNote(note);
         }
 
         @Override
@@ -464,6 +500,18 @@ public interface Extractor
         }
 
         @Override
+        public void setSecurity(Security security)
+        {
+            entry.setSecurity(security);
+        }
+
+        @Override
+        public void setNote(String note)
+        {
+            entry.setNote(note);
+        }
+
+        @Override
         public String getSource()
         {
             return entry.getSourceTransaction().getSource();
@@ -518,6 +566,18 @@ public interface Extractor
         }
 
         @Override
+        public void setSecurity(Security security)
+        {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void setNote(String note)
+        {
+            security.setNote(note);
+        }
+
+        @Override
         public Status apply(ImportAction action, Context context)
         {
             return action.process(security);
@@ -563,6 +623,18 @@ public interface Extractor
         public Security getSecurity()
         {
             return security;
+        }
+
+        @Override
+        public void setSecurity(Security security)
+        {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void setNote(String note)
+        {
+            // not supported; prices have no notes
         }
 
         @Override
