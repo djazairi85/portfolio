@@ -149,10 +149,6 @@ public final class UpdateQuotesJob extends AbstractClientJob
     protected IStatus run(IProgressMonitor monitor)
     {
         monitor.beginTask(Messages.JobLabelUpdating, IProgressMonitor.UNKNOWN);
-        if(java.time.LocalTime.now().isAfter(LocalTime.parse(LATESTUPDATE)))
-        {
-            return Status.CANCEL_STATUS;
-        }
         
         List<Security> securities = getClient().getSecurities().stream().filter(filter).collect(Collectors.toList());
 
@@ -176,7 +172,7 @@ public final class UpdateQuotesJob extends AbstractClientJob
         if (!monitor.isCanceled() && dirtyable.isDirty())
             getClient().markDirty();
 
-        if (repeatPeriod > 0)
+        if (repeatPeriod > 0 && !java.time.LocalTime.now().isAfter(LocalTime.parse(LATESTUPDATE)))
             schedule(repeatPeriod);
 
         return Status.OK_STATUS;

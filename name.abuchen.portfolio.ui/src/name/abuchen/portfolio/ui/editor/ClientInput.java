@@ -566,10 +566,10 @@ public class ClientInput
             checkInvestmentPlans.startAfter(initialQuoteUpdate);
             checkInvestmentPlans.schedule(1100);
 
-            int threeMinutes = 1000 * 60 * 3;
+            int eightMinutes = 1000 * 60 * 8;
             Job job = new UpdateQuotesJob(client, onlyActive, EnumSet.of(UpdateQuotesJob.Target.LATEST))
-                            .repeatEvery(threeMinutes);
-            job.schedule(threeMinutes);
+                            .repeatEvery(eightMinutes);
+            job.schedule(eightMinutes);
             regularJobs.add(job);
 
             int sixHours = 1000 * 60 * 60 * 6;
